@@ -267,11 +267,6 @@ export default function Header() {
               placeholder="Search questions, topics, or tags..."
               className="w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
             />
-            {/* Optional Keyboard Shortcut Hint */}
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-1">
-              <kbd className="px-2 py-1 text-[10px] font-bold text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md">⌘</kbd>
-              <kbd className="px-2 py-1 text-[10px] font-bold text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md">K</kbd>
-            </div>
 
             {/* Dropdown with results */}
             {isSearchOpen && debouncedQuery.length >= 2 && (

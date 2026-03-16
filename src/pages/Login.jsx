@@ -7,7 +7,7 @@ import {
   GithubAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { auth } from "../firebase/config"; // នាំចូល Firebase auth
+import { auth } from "../firebase/config"; 
 import { useLoginMutation } from "../features/auth/authApi";
 import { selectIsAuthenticated } from "../features/auth/authSlice";
 import { useOAuthSync } from "../hooks/useOAuthSync";
@@ -79,9 +79,14 @@ export default function Login() {
     }
   };
 
+  // --- Google Sign In ---
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      // បន្ថែម scopes ដើម្បីធានាថាបានអ៊ីមែល
+      provider.addScope('email');
+      provider.addScope('profile');
+      
       const result = await signInWithPopup(auth, provider);
       const success = await syncOAuthUser(result.user, "Google");
       if (success) navigate("/questions");
@@ -91,21 +96,26 @@ export default function Login() {
     }
   };
 
+  // --- GitHub Sign In ---
   const handleGithubSignIn = async () => {
     try {
       const provider = new GithubAuthProvider();
+      // សុំសិទ្ធិមើលអ៊ីមែល និង Profile
+      provider.addScope("user:email");
+      provider.addScope("read:user");
+
       const result = await signInWithPopup(auth, provider);
       const success = await syncOAuthUser(result.user, "GitHub");
       if (success) navigate("/questions");
     } catch (err) {
       if (err.code === "auth/popup-closed-by-user") return;
-      toast.error(err?.message || "Login with GitHub failed.");
+      toast.error("GitHub Login failed: " + err.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-[520px] p-12 transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 transition-colors duration-300 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-[520px] p-8 md:p-12 transition-colors duration-300">
         <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
           Login To Your Account
         </h2>
@@ -114,36 +124,31 @@ export default function Login() {
         </p>
 
         {/* Social login buttons */}
-        <div className="mb-6 flex gap-4">
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <button
             type="button"
-            disabled={oauthLoading === "google"}
-            className={`w-full h-12 rounded-xl font-semibold bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-800/30 transition flex items-center justify-center gap-3 ${
-              oauthLoading === "google" ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            disabled={!!oauthLoading}
             onClick={handleGoogleSignIn}
+            className={`w-full h-12 rounded-xl font-semibold bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 hover:bg-sky-200 transition flex items-center justify-center gap-3 disabled:opacity-50`}
           >
             <FcGoogle className="w-6 h-6" />
-            Google
+            {oauthLoading === "google" ? "Connecting..." : "Google"}
           </button>
+          
           <button
             type="button"
-            disabled={oauthLoading === "github"}
-            className={`w-full h-12 rounded-xl font-semibold bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-800/30 transition flex items-center justify-center gap-3 ${
-              oauthLoading === "github" ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            disabled={!!oauthLoading}
             onClick={handleGithubSignIn}
+            className={`w-full h-12 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 transition flex items-center justify-center gap-3 disabled:opacity-50`}
           >
             <FaGithub className="w-6 h-6" />
-            GitHub
+            {oauthLoading === "github" ? "Connecting..." : "GitHub"}
           </button>
         </div>
 
         <div className="flex items-center mb-6">
           <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
-          <span className="px-3 text-gray-400 dark:text-gray-500 text-sm">
-            or
-          </span>
+          <span className="px-3 text-gray-400 dark:text-gray-500 text-sm">or</span>
           <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
         </div>
 
@@ -158,7 +163,7 @@ export default function Login() {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="w-full h-12 border border-blue-400 dark:border-blue-600 rounded-xl px-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
+              className="w-full h-12 border border-blue-400 dark:border-blue-600 rounded-xl px-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               required
             />
           </div>
@@ -174,7 +179,7 @@ export default function Login() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
-                className="w-full h-12 border border-blue-400 dark:border-blue-600 rounded-xl px-4 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
+                className="w-full h-12 border border-blue-400 dark:border-blue-600 rounded-xl px-4 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 required
               />
               <button
@@ -193,14 +198,11 @@ export default function Login() {
                 type="checkbox"
                 checked={remember}
                 onChange={() => setRemember(!remember)}
-                className="accent-blue-500 dark:accent-blue-400"
+                className="accent-blue-500"
               />
               Remember me
             </label>
-            <Link
-              to="/forgot-password"
-              className="text-sm text-blue-500 dark:text-blue-400 hover:underline"
-            >
+            <Link to="/forgot-password" hidden className="text-sm text-blue-500 hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -210,8 +212,8 @@ export default function Login() {
             disabled={isLoading}
             className={`w-full h-12 rounded-xl font-semibold text-white transition-all duration-300 ${
               isLoading
-                ? "bg-blue-300 dark:bg-blue-700 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 hover:shadow-lg"
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg"
             }`}
           >
             {isLoading ? "Logging in..." : "Login"}
@@ -220,10 +222,7 @@ export default function Login() {
 
         <p className="text-center text-gray-600 dark:text-gray-300 text-sm mt-6">
           Don't have an account?{" "}
-          <Link
-            to="/signup"
-            className="text-blue-500 dark:text-blue-400 font-semibold hover:underline"
-          >
+          <Link to="/signup" className="text-blue-500 font-semibold hover:underline">
             Create new account
           </Link>
         </p>
