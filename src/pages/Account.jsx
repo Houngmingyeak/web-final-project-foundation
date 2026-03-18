@@ -147,7 +147,7 @@ function QuestionRow({ q }) {
         <p className="text-[11px] text-slate-400 flex items-center gap-1">
           <FiClock className="w-3 h-3" />
           {q.creationDate
-            ? formatDistanceToNow(new Date(q.creationDate), { addSuffix: true })
+            ? formatDistanceToNow(new Date(q.creationDate + "Z"), { addSuffix: true })
             : "Recently"}
         </p>
       </div>
@@ -347,7 +347,7 @@ export default function Account() {
   const comments = profile.comments ?? [];
   const savedCount = bookmarks.length;
   const memberSince = profile.creationDate
-    ? format(new Date(profile.creationDate), "MMM yyyy")
+    ? format(new Date(profile.creationDate + "Z"), "MMM yyyy")
     : "—";
 
   const activities = [
@@ -356,7 +356,7 @@ export default function Account() {
       type: "question",
       title: "Asked a Question",
       description: q.title,
-      date: new Date(q.creationDate || Date.now()),
+      date: q.creationDate ? new Date(q.creationDate + "Z") : new Date(),
       link: `/question/${q.id}`,
       icon: FiHelpCircle,
       color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-500/20",
@@ -366,7 +366,7 @@ export default function Account() {
       type: "answer",
       title: "Answered a Question",
       description: c.text || c.body || "",
-      date: new Date(c.creationDate || Date.now()),
+      date: c.creationDate ? new Date(c.creationDate + "Z") : new Date(),
       link: `/question/${c.postId || c.post?.id || ""}`,
       icon: FiMessageSquare,
       color: "text-purple-500 bg-purple-50 dark:bg-purple-500/20",
@@ -380,6 +380,10 @@ export default function Account() {
     questions: questions.length,
     answers: comments.length,
     challenges: 12,
+    reputation: profile?.reputation ?? 0,
+    views: profile?.views ?? 0,
+    upVotes: profile?.upVotes ?? 0,
+    downVotes: profile?.downVotes ?? 0,
   };
 
   // ── New Categorized Achievements Data ──
@@ -542,6 +546,35 @@ export default function Account() {
               color="text-orange-600"
               bg="bg-orange-50 dark:bg-orange-900/20"
             />
+            
+            <StatCard
+              icon={FiStar}
+              label="Reputation"
+              value={stats.reputation}
+              color="text-amber-500"
+              bg="bg-amber-50 dark:bg-amber-900/20"
+            />
+            <StatCard
+              icon={FiEye}
+              label="Views"
+              value={stats.views}
+              color="text-sky-500"
+              bg="bg-sky-50 dark:bg-sky-900/20"
+            />
+            <StatCard
+              icon={FiThumbsUp}
+              label="UpVotes"
+              value={stats.upVotes}
+              color="text-emerald-500"
+              bg="bg-emerald-50 dark:bg-emerald-500/20"
+            />
+            <StatCard
+              icon={FiThumbsDown}
+              label="DownVotes"
+              value={stats.downVotes}
+              color="text-rose-500"
+              bg="bg-rose-50 dark:bg-rose-900/20"
+            />
           </div>
 
           {/* Tabs Section */}
@@ -609,7 +642,7 @@ export default function Account() {
                           </p>
                           <p className="text-xs text-gray-500 mt-2">
                             {c.creationDate
-                              ? formatDistanceToNow(new Date(c.creationDate), {
+                              ? formatDistanceToNow(new Date(c.creationDate + "Z"), {
                                   addSuffix: true,
                                 })
                               : "Recently"}

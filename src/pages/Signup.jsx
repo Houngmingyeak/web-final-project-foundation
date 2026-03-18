@@ -7,7 +7,7 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
 } from "firebase/auth";
-import { auth } from "../firebase/config"; // លែងត្រូវការ db សម្រាប់ OAuth
+import { auth } from "../firebase/config"; // No longer need db for OAuth
 import { Eye, EyeOff } from "lucide-react";
 import { useRegisterMutation } from "../features/auth/authApi";
 import { selectIsAuthenticated } from "../features/auth/authSlice";
@@ -44,9 +44,9 @@ export default function Signup() {
     return <Navigate to="/questions" replace />;
   }
 
-  // បង្ហាញ error ពី API (បើមាន)
-  // error អាចជា object ដែលមាន data.message
-  // យើងលែងប្រើ error ពី useRegisterMutation ដោយផ្ទាល់ទេ ព្រោះយើងប្រើ toast រួចហើយ
+  // Show error from API (if any)
+  // error could be an object with data.message
+  // We no longer use error from useRegisterMutation directly because we already use toast
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -59,11 +59,11 @@ export default function Signup() {
     const { username, email, password, confirmPassword } = formData;
 
     if (password !== confirmPassword) {
-      setLocalError("ពាក្យសម្ងាត់មិនដូចគ្នា");
+      setLocalError("Passwords do not match");
       return;
     }
     if (password.length < 6) {
-      setLocalError("ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ");
+      setLocalError("Password must be at least 6 characters");
       return;
     }
 
@@ -74,10 +74,10 @@ export default function Signup() {
         password,
         confirmPassword,
       }).unwrap();
-      toast.success("គណនីត្រូវបានបង្កើតដោយជោគជ័យ! ✅");
+      toast.success("Account created successfully! ✅");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      toast.error(err?.data?.message || "ការចុះឈ្មោះបរាជ័យ");
+      toast.error(err?.data?.message || "Registration failed");
     }
   };
 
@@ -249,7 +249,7 @@ export default function Signup() {
                 : "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
             }`}
           >
-            {isLoading ? "កំពុងចុះឈ្មោះ..." : "Create Account"}
+            {isLoading ? "Registering..." : "Create Account"}
           </button>
 
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-4 text-center">

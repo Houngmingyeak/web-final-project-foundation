@@ -384,7 +384,7 @@ export default function QuestionDetailPage() {
                     {currentPost.ownerDisplayName}
                   </span>{" "}
                   •{" "}
-                  {formatDistanceToNow(new Date(currentPost.creationDate), {
+                  {formatDistanceToNow(new Date(currentPost.creationDate + "Z"), {
                     addSuffix: true,
                   })}
                 </span>
@@ -497,7 +497,7 @@ export default function QuestionDetailPage() {
                             </span>{" "}
                             •{" "}
                             {formatDistanceToNow(
-                              new Date(answer.creationDate),
+                              new Date(answer.creationDate + "Z"),
                               { addSuffix: true },
                             )}
                           </div>

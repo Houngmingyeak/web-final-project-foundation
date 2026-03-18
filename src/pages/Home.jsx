@@ -101,45 +101,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* DYNAMIC CONTENT: RECENT QUESTIONS (Styled to match the old design) */}
-      <section className="py-24 px-6 max-w-7xl mx-auto border-t border-slate-100 dark:border-gray-900">
-        <div className="flex items-center justify-between mb-12">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">Recent Questions</h2>
-            <p className="text-slate-600 dark:text-gray-400">Join the latest discussions in the community.</p>
-          </div>
-          <Link to="/questions" className="text-blue-600 font-semibold hover:underline flex items-center gap-1">
-            Browse all <FaArrowRight className="text-xs" />
-          </Link>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          {postsLoading ? (
-            [...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl animate-pulse" />
-            ))
-          ) : (
-            posts?.slice(0, 4).map((post) => (
-              <Link 
-                key={post.id} 
-                to={`/question/${post.id}`}
-                className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-6 rounded-2xl hover:shadow-lg transition group"
-              >
-                <h3 className="font-bold text-lg mb-4 group-hover:text-blue-600 transition-colors line-clamp-1">{post.title}</h3>
-                <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-gray-400">
-                  <span className="flex items-center gap-2">
-                    <FiUser className="text-blue-500" /> {post.ownerDisplayName}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <FiMessageCircle className="text-green-500" /> {post.comments?.length || 0} answers
-                  </span>
-                </div>
-              </Link>
-            ))
-          )}
-        </div>
-      </section>
-
       {/* FEATURES */}
       <section id="features" className="py-24 px-6 max-w-7xl mx-auto border-t border-slate-100 dark:border-gray-900">
         <h2 className="text-4xl font-bold text-center mb-4">

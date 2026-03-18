@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// អានទិន្នន័យពី localStorage ពេលចាប់ផ្ដើមកម្មវិធី
+// Read data from localStorage when the app starts
 const storedToken = localStorage.getItem('token');
 const storedUser = localStorage.getItem('user');
 
@@ -20,7 +20,7 @@ const authSlice = createSlice({
       state.user = { id: userId, email, displayName };
       state.isAuthenticated = true;
       
-      // រក្សាទុកក្នុង localStorage
+      // Save in localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify({ id: userId, email, displayName }));
     },
@@ -29,7 +29,7 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       
-      // លុបចេញពី localStorage
+      // Remove from localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     },

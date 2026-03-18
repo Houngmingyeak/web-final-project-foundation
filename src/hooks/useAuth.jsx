@@ -9,8 +9,6 @@ import {
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/config'; // Changed from '@/lib/firebase'
 
-export const UserProfile = {};
-
 const AuthContext = createContext(undefined);
 
 export function AuthProvider({ children }) {
@@ -98,7 +96,6 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
-    isAdmin: userProfile?.role === 'admin',
   };
 
   return (

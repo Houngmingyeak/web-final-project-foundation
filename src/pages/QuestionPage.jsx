@@ -41,7 +41,7 @@ function mapPost(post) {
     comments: post.comments?.length ?? 0,
     views: post.viewCount ?? 0,
     time: post.creationDate
-      ? formatDistanceToNow(new Date(post.creationDate), { addSuffix: true })
+      ? formatDistanceToNow(new Date(post.creationDate + "Z"), { addSuffix: true })
       : "",
   };
 }
@@ -70,10 +70,10 @@ export default function QuestionsPage() {
     }
 
     if (activeTab === "Newest") {
-      return list.sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate));
+      return list.sort((a, b) => new Date(b.creationDate + "Z") - new Date(a.creationDate + "Z"));
     }
     if (activeTab === "Active") {
-      return list.sort((a, b) => new Date(b.lastActivityDate) - new Date(a.lastActivityDate));
+      return list.sort((a, b) => new Date(b.lastActivityDate + "Z") - new Date(a.lastActivityDate + "Z"));
     }
     if (activeTab === "Unanswered") {
       return list.filter((p) => (p.comments?.length ?? 0) === 0);

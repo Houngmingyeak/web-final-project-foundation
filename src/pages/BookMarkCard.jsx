@@ -56,7 +56,7 @@ function Skeleton() {
 // `post` is a full post object from bookMarkList
 function BookmarkItem({ post, onRemove, removing }) {
   const timeAgo = post.creationDate
-    ? formatDistanceToNow(new Date(post.creationDate), { addSuffix: true })
+    ? formatDistanceToNow(new Date(post.creationDate + "Z"), { addSuffix: true })
     : "";
 
   return (

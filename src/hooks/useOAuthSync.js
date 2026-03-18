@@ -1,25 +1,29 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useLoginMutation, useRegisterMutation } from '../features/auth/authApi';
+import { useUpdatePasswordMutation } from '../features/profile/profileApi';
 
 export function useOAuthSync() {
     const [login] = useLoginMutation();
     const [register] = useRegisterMutation();
+    const [updatePassword] = useUpdatePasswordMutation();
     const [loading, setLoading] = useState('');
 
     const syncOAuthUser = async (user, providerName) => {
         setLoading(providerName.toLowerCase());
 
-        // ១. ទាញយក Email (ឆែកទាំង Top-level និង providerData)
+        // 1. Get Email (check both Top-level and providerData)
         const email = user.email || 
                       (user.providerData && user.providerData[0]?.email) || 
                       "";
         
-        // ២. កំណត់ Password រួមមួយសម្រាប់ Social Login (សំខាន់បំផុតសម្រាប់ករណីគ្មានសិទ្ធិកែ Backend)
-        // វិធីនេះជួយឱ្យ Google និង GitHub ប្រើ Password ដូចគ្នា ទើប Backend ព្រមឱ្យចូល
-        const oauthPassword = `OAuthUser@${email.length}${user.uid.slice(0, 5)}`;
+        // 2. Set static Password for Social Login (most important for case without access to modify Backend)
+        // This way helps Google and GitHub use the same password, so Backend allows entry
+        const staticSalt = "SocialSync#MindStack2026";
+        const passwordUnified = `OAuthUser@${email.length}${email.split('@')[0]}${staticSalt}`;
+        const passwordFallback = `OAuthUser@${email.length}${user.uid.slice(0, 5)}`;
 
-        // ៣. បង្កើត Username ដោយសុវត្ថិភាព
+        // 3. Generate Username safely
         let username = "";
         const displayName = user.displayName || (user.providerData && user.providerData[0]?.displayName);
         
@@ -33,54 +37,89 @@ export function useOAuthSync() {
             username = `user${user.uid.slice(0, 6)}`;
         }
 
-        // ៤. បញ្ឈប់បើគ្មាន Email
+        // 4. Stop if no Email
         if (!email) {
-            toast.error(`មិនអាចទាញយកអ៊ីមែលពី ${providerName} បានទេ។ សូមពិនិត្យ Privacy ក្នុង Account របស់អ្នក។`);
+            toast.error(`Cannot retrieve email from ${providerName}. Please check Privacy in your Account.`);
             setLoading('');
             return false;
         }
 
         try {
-            // ជំហានទី ១: ព្យាយាម Login ជាមួយ Password រួម
-            await login({ email, password: oauthPassword }).unwrap();
-            toast.success(`ចូលប្រើជាមួយ ${providerName} ជោគជ័យ! 🎉`);
-            setLoading('');
-            return true;
+            // Step 1: Try to Login with candidate passwords
+            let loggedIn = false;
+            let loginError = null;
+
+            try {
+                await login({ email, password: passwordUnified }).unwrap();
+                loggedIn = true;
+            } catch (errUnified) {
+                loginError = errUnified;
+                if (errUnified.status === 401 || errUnified.status === 404) {
+                    try {
+                        await login({ email, password: passwordFallback }).unwrap();
+                        loggedIn = true;
+
+                        // Self-healing migration: Update password to unified for next time
+                        try {
+                            await updatePassword({
+                                oldPassword: passwordFallback,
+                                newPassword: passwordUnified,
+                                confirmedNewPassword: passwordUnified
+                            }).unwrap();
+                            console.log("OAuth Password migrated to Unified formula successfully.");
+                        } catch (migErr) {
+                            // Ignore migration failures as long as login succeeded
+                            console.warn("OAuth Password migration failed:", migErr);
+                        }
+                    } catch (errFallback) {
+                        loginError = errFallback;
+                    }
+                }
+            }
+
+            if (loggedIn) {
+                toast.success(`Login with ${providerName} successful! 🎉`);
+                setLoading('');
+                return true;
+            }
+
+            throw loginError; // hit catch block below
         } catch (err) {
-            // ជំហានទី ២: បើ Login បរាជ័យ (ប្រហែលជាមិនទាន់មាន Account)
+            // Step 2: If Login fails (maybe no account yet)
             const isUnauthorized = err.status === 401 || err.status === 404 || err.status === 403 || err.status === 400;
             
             if (isUnauthorized) {
                 try {
-                    // ធ្វើការចុះឈ្មោះ (Register) ដោយប្រើ Password រួមនោះដែរ
+                    // Register using the static Unified Password
                     await register({
                         username,
                         email,
-                        password: oauthPassword,
-                        confirmPassword: oauthPassword
+                        password: passwordUnified,
+                        confirmPassword: passwordUnified
                     }).unwrap();
 
-                    // បន្ទាប់ពី Register រួច ហៅ Login ម្ដងទៀត
-                    await login({ email, password: oauthPassword }).unwrap();
+                    // After Register, Login with Unified Password
+                    await login({ email, password: passwordUnified }).unwrap();
                     
-                    toast.success(`បង្កើតគណនី និងចូលប្រើជាមួយ ${providerName} រួចរាល់! 🎉`);
+                    toast.success(`Account created and login with ${providerName} completed! 🎉`);
                     setLoading('');
                     return true;
                 } catch (regErr) {
                     console.error("OAuth Sync Error:", regErr);
                     const msg = regErr?.data?.message || "";
                     
-                    // បើនៅតែ Error 409 មានន័យថា Email នេះធ្លាប់ Register ជាមួយ Password ធម្មតា (Manual) បាត់ហើយ
+                    // If still Error 409, it means this Email was already Registered with normal Password (Manual)
                     if (regErr.status === 409 || msg.toLowerCase().includes('email')) {
-                        toast.warning(`អ៊ីមែលនេះមានរួចហើយជាមួយ Password ផ្សេង។ សូមប្រើអ៊ីមែលផ្សេង ឬ Login ធម្មតា។`);
+                        toast.warning(`This email already exists with a different password. Please use a different email or Login normally.`);
+                        toast.info(`💡 If you previously used another social provider (e.g. Google/GitHub), please login with that provider first so we can sync your accounts.`, { autoClose: 8000 });
                     } else {
-                        toast.error(msg || `មានបញ្ហាបច្ចេកទេសជាមួយ ${providerName}`);
+                        toast.error(msg || `Technical issue with ${providerName}`);
                     }
                     setLoading('');
                     return false;
                 }
             } else {
-                toast.error(err?.data?.message || `ការភ្ជាប់ទៅកាន់ Server បរាជ័យ`);
+                toast.error(err?.data?.message || `Connection to Server failed`);
                 setLoading('');
                 return false;
             }

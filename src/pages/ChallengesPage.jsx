@@ -146,7 +146,7 @@ function PostRow({ post, index }) {
     post.comments?.length ?? 0,
   );
   const timeAgo = post.creationDate
-    ? formatDistanceToNow(new Date(post.creationDate), { addSuffix: true })
+    ? formatDistanceToNow(new Date(post.creationDate + "Z"), { addSuffix: true })
     : "";
 
   return (
@@ -366,7 +366,7 @@ export default function ChallengesPage() {
 
   filtered = [...filtered].sort((a, b) => {
     if (sort === "Newest")
-      return new Date(b.creationDate) - new Date(a.creationDate);
+      return new Date(b.creationDate + "Z") - new Date(a.creationDate + "Z");
     if (sort === "Most Viewed") return (b.viewCount ?? 0) - (a.viewCount ?? 0);
     if (sort === "Most Commented")
       return (b.comments?.length ?? 0) - (a.comments?.length ?? 0);

@@ -28,7 +28,7 @@ export const authApi = createApi({
     }),
     googleLogin: builder.mutation({
       query: ({ token }) => ({
-        url: '/auth/google',  // ត្រូវប្រាកដថា endpoint នេះមាននៅក្នុង API
+        url: '/auth/google',  // Make sure this endpoint exists in the API
         method: 'POST',
         body: { token },
       }),
@@ -41,7 +41,7 @@ export const authApi = createApi({
     }),
     githubLogin: builder.mutation({
       query: ({ token }) => ({
-        url: '/auth/github',  // ត្រូវប្រាកដថា endpoint នេះមាន
+        url: '/auth/github',  // Make sure this endpoint exists
         method: 'POST',
         body: { token },
       }),

@@ -64,7 +64,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      toast.error("សូមបញ្ចូលអ៊ីមែល និងពាក្យសម្ងាត់");
+      toast.error("Please enter email and password");
       return;
     }
     try {
@@ -72,10 +72,10 @@ export default function Login() {
         email: formData.email,
         password: formData.password,
       }).unwrap();
-      toast.success("ចូលប្រើជោគជ័យ! 🎉");
+      toast.success("Login successful! 🎉");
       navigate("/questions");
     } catch (err) {
-      toast.error(err?.data?.message || "ការចូលប្រើបរាជ័យ");
+      toast.error(err?.data?.message || "Login failed");
     }
   };
 
@@ -83,7 +83,7 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      // បន្ថែម scopes ដើម្បីធានាថាបានអ៊ីមែល
+      // Add scopes to ensure email is retrieved
       provider.addScope('email');
       provider.addScope('profile');
       
@@ -100,7 +100,7 @@ export default function Login() {
   const handleGithubSignIn = async () => {
     try {
       const provider = new GithubAuthProvider();
-      // សុំសិទ្ធិមើលអ៊ីមែល និង Profile
+      // Request permission to view email and Profile
       provider.addScope("user:email");
       provider.addScope("read:user");
 

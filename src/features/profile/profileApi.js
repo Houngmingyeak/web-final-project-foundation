@@ -1,7 +1,18 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from '../../utils/apiClient';
 
-const API_BASE_URL = 'https://forum-istad-api.cheat.casa'; // ឬទាញពី .env
+const API_BASE_URL = 'https://forum-istad-api.cheat.casa'; // Or fetch from .env
+
+const transformProfileImage = (response) => {
+  if (response?.profileImage) {
+    if (response.profileImage.includes('localhost:8070')) {
+      response.profileImage = response.profileImage.replace('http://localhost:8070/api/v1/profile-images', `${API_BASE_URL}/api/v1/media`);
+    } else if (response.profileImage.startsWith('/')) {
+      response.profileImage = `${API_BASE_URL}${response.profileImage}`;
+    }
+  }
+  return response;
+};
 
 export const profileApi = createApi({
   reducerPath: 'profileApi',
@@ -11,17 +22,12 @@ export const profileApi = createApi({
     getProfile: builder.query({
       query: () => '/users/me',
       providesTags: ['Profile'],
-      transformResponse: (response) => {
-        if (response.profileImage) {
-          // កែ URL រូបភាពឲ្យប្រើ domain ត្រឹមត្រូវ
-          if (response.profileImage.includes('localhost:8070')) {
-            response.profileImage = response.profileImage.replace('http://localhost:8070/api/v1/profile-images', `${API_BASE_URL}/api/v1/media`);
-          } else if (response.profileImage.startsWith('/')) {
-            response.profileImage = `${API_BASE_URL}${response.profileImage}`;
-          }
-        }
-        return response;
-      },
+      transformResponse: transformProfileImage,
+    }),
+    getUserById: builder.query({
+      query: (userId) => `/users/${userId}`,
+      providesTags: (result, error, userId) => [{ type: 'Profile', id: userId }],
+      transformResponse: transformProfileImage,
     }),
     uploadProfileImage: builder.mutation({
       query: (file) => {
@@ -33,17 +39,7 @@ export const profileApi = createApi({
           body: formData,
         };
       },
-      transformResponse: (response) => {
-        // កែ URL រូបភាពក្នុងការឆ្លើយតបពីការ Upload (បើមាន)
-        if (response.profileImage) {
-          if (response.profileImage.includes('localhost:8070')) {
-            response.profileImage = response.profileImage.replace('http://localhost:8070/api/v1/profile-images', `${API_BASE_URL}/api/v1/media`);
-          } else if (response.profileImage.startsWith('/')) {
-            response.profileImage = `${API_BASE_URL}${response.profileImage}`;
-          }
-        }
-        return response;
-      },
+      transformResponse: transformProfileImage,
       invalidatesTags: ['Profile'],
     }),
     updateUser: builder.mutation({
@@ -66,6 +62,7 @@ export const profileApi = createApi({
 
 export const {
   useGetProfileQuery,
+  useGetUserByIdQuery,
   useUploadProfileImageMutation,
   useUpdateUserMutation,
   useUpdatePasswordMutation,
