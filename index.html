@@ -2,25 +2,89 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="https://www.mindstack.study/mindstack.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mind_stack</title>
+    
+    <title>MindStack | Gamified Q&A and Social Learning Platform for Software Developers</title>
+    <meta name="title" content="MindStack | Gamified Q&A and Social Learning Platform for Software Developers" />
+    <meta name="description" content="MindStack is a gamified Q&A platform addressing coding questions, debugging tips, and software development challenges. Ask questions, earn badges, and level up with fellow developers." />
+    <meta name="keywords" content="MindStack, developer platform, coding help, Q&A, developer community, code challenges, level up, debugging, khmer developers" />
+    <link rel="canonical" href="https://www.mindstack.study/" />
 
-    <!-- FOUC Prevention Script -->
+    <link rel="preconnect" href="https://forum-istad-api.cheat.casa" />
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MindStack",
+      "url": "https://www.mindstack.study/",
+      "description": "MindStack is a gamified Q&A platform addressing coding questions, debugging tips, and software development challenges."
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "MindStack",
+      "logo": "https://www.mindstack.study/mindstack.png",
+      "url": "https://www.mindstack.study/",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Street 32",
+        "addressLocality": "Phnom Penh",
+        "addressRegion": "Phnom Penh",
+        "postalCode": "12000",
+        "addressCountry": "KH"
+      }
+    }
+    </script>
+
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      
+      // ប្តូរ 'YOUR_FACEBOOK_PIXEL_ID' ជាមួយ ID របស់អ្នក
+      const pixelId = 'YOUR_FACEBOOK_PIXEL_ID'; 
+      if (pixelId && pixelId !== 'YOUR_FACEBOOK_PIXEL_ID') {
+        fbq('init', pixelId);
+        fbq('track', 'PageView');
+      }
+    </script>
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.mindstack.study/" />
+    <meta property="og:title" content="MindStack | Gamified Q&A Platform for Developers" />
+    <meta property="og:description" content="Ask Questions, Earn Badges, and Level Up with developers worldwide." />
+    <meta property="og:image" content="https://www.mindstack.study/og-image.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://www.mindstack.study/" />
+    <meta name="twitter:title" content="MindStack | Gamified Q&A Platform for Developers" />
+    <meta name="twitter:description" content="Ask Questions, Earn Badges, and Level Up with developers worldwide." />
+    <meta name="twitter:image" content="https://www.mindstack.study/og-image.png" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YOUR_MEASUREMENT_ID');
+    </script>
+
     <script>
       (function () {
         const savedMode = localStorage.getItem("theme-mode") || "system";
-
-        const getSystemTheme = () =>
-          window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-
-        const resolved =
-          savedMode === "system" ? getSystemTheme() : savedMode;
-
+        const getSystemTheme = () => window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        const resolved = savedMode === "system" ? getSystemTheme() : savedMode;
         document.documentElement.setAttribute("data-theme", resolved);
-
         if (resolved === "dark") {
           document.documentElement.classList.add("dark");
         } else {

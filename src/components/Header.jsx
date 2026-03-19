@@ -6,7 +6,7 @@ import { useGetProfileQuery } from '../features/profile/profileApi';
 import { useAuthImage } from '../hooks/useAuthImage';
 import { FiSearch, FiMoon, FiSun, FiMenu, FiX, FiUser, FiHash, FiMessageSquare } from 'react-icons/fi';
 import { SlNote } from 'react-icons/sl';
-import MindStack from '../assets/Mindstack.png';
+import MindStack from '../assets/mindstack.png';
 import { useTheme } from '../context/ThemeContext';
 import { useSearchUsersQuery, useSearchTagsQuery, useSearchCommentsQuery } from '../features/search/searchApi';
 import { navItems } from '../layout/Sidebar';
@@ -69,7 +69,7 @@ export default function Header() {
   const navLinks = [
     { label: "Features", to: "/features " },
     { label: "Testimonials", to: "/testimonials" },
-    { label: "About Us", to: "/aboutus" },
+    { label: "About Us", to: "/about-us" },
   ];
 
   if (isHomePage) {
@@ -80,7 +80,7 @@ export default function Header() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
               <div className="w-9 h-9 rounded-lg flex items-center justify-center dark:shadow-blue-900/30">
-                <img src={MindStack} alt="" />
+                <img src={MindStack} alt="MindStack Logo" />
               </div>
               <span className="text-[22px] font-black text-gray-900 dark:text-white tracking-tight">
                 MindStack
@@ -244,7 +244,7 @@ export default function Header() {
             className="flex items-center gap-2 shrink-0 group"
           >
             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-lg transition-transform group-hover:scale-105">
-              <img src={MindStack} alt="" />
+              <img src={MindStack} alt="MindStack Logo" />
             </div>
             <span className="text-lg font-black text-gray-900 dark:text-white tracking-tight hidden sm:block">
               MindStack

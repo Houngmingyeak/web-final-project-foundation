@@ -6,6 +6,26 @@ import flowbiteReact from "flowbite-react/plugin/vite"
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('@heroui') || id.includes('@radix-ui')) {
+              return 'ui-libs';
+            }
+            if (id.includes('firebase')) {
+              return 'firebase-bundle';
+            }
+            if (id.includes('framer-motion')) {
+              return 'animations';
+            }
+            return 'vendor'; // standard chunk
+          }
+        }
+      }
+    }
+  },
   server: {
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin-allow-popups",

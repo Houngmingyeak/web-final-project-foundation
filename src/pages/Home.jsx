@@ -10,6 +10,7 @@ import { GoStarFill } from "react-icons/go";
 import { FiSearch, FiUser, FiMessageCircle, FiClock } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useGetPostsQuery, useGetPostsSortedByScoreQuery, useGetTagsQuery } from "../features/post/postsApi";
+import SEO from "../components/SEO";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ const HomePage = () => {
 
   return (
     <main className="bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-white transition-colors duration-300">
+      <SEO title="Home" description="MindStack is a gamified Q&A platform for developers. Level up together by asking questions, sharing answers, and earning points." />
       {/* HERO */}
       <section className="relative text-center py-24 px-6 overflow-hidden">
         <img

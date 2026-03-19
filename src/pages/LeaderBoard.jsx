@@ -1,5 +1,6 @@
 import { GoTrophy } from "react-icons/go";
 import Sidebar from "../layout/Sidebar";
+import SEO from "../components/SEO";
 import { LuMedal, LuCrown } from "react-icons/lu";
 import { FiUser } from "react-icons/fi";
 import { useGetPostsSortedByScoreQuery } from "../features/post/postsApi";
@@ -209,6 +210,7 @@ export default function Leaderboard() {
 
   return (
     <div className="flex min-h-screen bg-slate-100 dark:bg-gray-900 font-sans transition-colors duration-300">
+      <SEO title="Leaderboard" description="See who is leading the high contributors rating on MindStack based on responses, scores, and XP earned." />
       <aside>
         <Sidebar className="hidden lg:flex" />
       </aside>

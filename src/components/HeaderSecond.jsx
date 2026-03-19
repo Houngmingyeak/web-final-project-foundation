@@ -1,5 +1,5 @@
 import React from "react";
-import MindStack from "../assets/Mindstack.png";
+import MindStack from "../assets/mindstack.png";
 import { GoSun } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { IoIosSearch } from "react-icons/io";

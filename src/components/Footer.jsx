@@ -1,9 +1,10 @@
 import React from "react";
 import Img from "../assets/istad.png";
-import { CiFacebook, CiLinkedin } from "react-icons/ci";
+import { CiFacebook, CiLinkedin, CiTwitter } from "react-icons/ci";
 import { PiTelegramLogo } from "react-icons/pi";
 import { CgMail } from "react-icons/cg";
-import imgMindStack from "../assets/Mindstack.png";
+import { FaYoutube, FaInstagram } from "react-icons/fa6";
+import imgMindStack from "../assets/mindstack.png";
 import { Link } from "react-router-dom";
 import { RiTiktokLine } from "react-icons/ri";
 
@@ -56,11 +57,18 @@ const Footer = () => {
           {/* Column 3: Get in touch */}
           <div className="flex flex-col items-center">
             <h3 className="text-xl font-bold mb-4">Get in touch</h3>
-            <div className="flex gap-6 mb-4">
-              <a href="https://www.facebook.com/istad.co"><CiFacebook className="text-2xl hover:text-blue-600 transition cursor-pointer" /></a>
-              <a href="https://t.me/istadkh?fbclid=IwY2xjawQfH4xleHRuA2FlbQIxMABicmlkETEzcnRBWjViVVNybXU3QW9Bc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHqIeprktCrU_pyCvaxh8LJBs8WKEcH4NhlTRGpOdFS8uwMX62sFYUZumziVf_aem_r1x1Ymf6_ZL14nJUp5WuJw"><PiTelegramLogo className="text-2xl hover:text-blue-600 transition cursor-pointer" /></a>
-              <a href="info.istad@gmail.com"><CgMail className="text-2xl hover:text-blue-600 transition cursor-pointer" /></a>
-              <a href="https://www.tiktok.com/@istad369"><RiTiktokLine  className="text-2xl hover:text-blue-600 transition cursor-pointer" /></a>
+            <div className="flex gap-4 mb-4 flex-wrap justify-center sm:justify-start">
+              <a href="https://www.facebook.com/istad.co" target="_blank" rel="noreferrer" title="Facebook"><CiFacebook className="text-2xl hover:text-blue-600 transition" /></a>
+              <a href="https://twitter.com/mindstack" target="_blank" rel="noreferrer" title="X (Twitter)"><CiTwitter className="text-2xl hover:text-blue-400 transition" /></a>
+              <a href="https://instagram.com/mindstack" target="_blank" rel="noreferrer" title="Instagram"><FaInstagram className="text-xl hover:text-pink-600 transition mt-0.5" /></a>
+              <a href="https://youtube.com/mindstack" target="_blank" rel="noreferrer" title="YouTube"><FaYoutube className="text-xl hover:text-red-600 transition mt-0.5" /></a>
+              <a href="https://linkedin.com/company/mindstack" target="_blank" rel="noreferrer" title="LinkedIn"><CiLinkedin className="text-2xl hover:text-blue-700 transition" /></a>
+              <a href="https://t.me/istadkh" target="_blank" rel="noreferrer" title="Telegram"><PiTelegramLogo className="text-2xl hover:text-blue-500 transition" /></a>
+            </div>
+            <div className="text-gray-500 dark:text-gray-400 text-xs text-center sm:text-left mt-2 mb-4 space-y-1">
+              <p>📍 St 32, Institute of Science & Technology</p>
+              <p>Phnom Penh, Cambodia</p>
+              <p>📞 +855 000 000</p>
             </div>
             <form className="w-full max-w-xs">
               <input

@@ -5,6 +5,7 @@ import { useGetPostsQuery } from "../features/post/postsApi";
 import { formatDistanceToNow } from "date-fns";
 import { useBookmarks } from "../hooks/useBookmarks";
 import { useSearchParams } from "react-router-dom";
+import SEO from "../components/SEO";
 
 const TABS = ["Newest", "Active", "Unanswered", "Most Voted"];
 
@@ -86,6 +87,7 @@ export default function QuestionsPage() {
 
   return (
     <div className="flex bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+      <SEO title="Questions" description="Explore developer questions, debugging answers, and software development discussions on MindStack." />
       <Sidebar className="hidden lg:flex" />
 
       <main className="flex-1 min-w-0">

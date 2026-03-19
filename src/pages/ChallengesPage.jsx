@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { formatDistanceToNow } from "date-fns";
 import Sidebar from "../layout/Sidebar";
+import SEO from "../components/SEO";
 import { useGetPostsByUserQuery } from "../features/post/postsApi";
 import { selectCurrentUser } from "../features/auth/authSlice";
 import { LuSwords } from "react-icons/lu";
@@ -382,6 +383,7 @@ export default function ChallengesPage() {
   if (!userId) {
     return (
       <div className="flex min-h-screen bg-slate-100 dark:bg-gray-900">
+        <SEO title="Dashboard" description="Login to track your challenges and activity stats rewards on MindStack." />
         <aside className="shrink-0">
           <Sidebar className="hidden lg:flex" />
         </aside>
@@ -407,6 +409,7 @@ export default function ChallengesPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-100 dark:bg-gray-900 transition-colors duration-300">
+      <SEO title="Dashboard" description="Track your scores, milestones, and daily activity rewards on MindStack." />
       <aside className="shrink-0">
         <Sidebar className="hidden lg:flex" />
       </aside>

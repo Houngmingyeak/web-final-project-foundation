@@ -1,17 +1,18 @@
 import { FaArrowRight } from "react-icons/fa6";
+import SEO from "../components/SEO";
 import { FaAngleRight } from "react-icons/fa";
 import { CgMediaLive } from "react-icons/cg";
 import { RiShieldLine } from "react-icons/ri";
 import { FiUsers } from "react-icons/fi";
 import CherPhengPic from "../assets/images/CherPhengPic.jpg";
 import CherCheatPic from "../assets/images/CherCheatPic.JPG";
-import YeakPic from "../assets/images/YeakPic.JPG";
+import YeakPic from "../assets/images/YeakPic.webp";
 import SoriyaPic from "../assets/images/SoriyaPic.jpg";
 import VanPic from "../assets/images/LokBongPic.png";
 import SaveunPic from "../assets/images/SavaunPic.png";
 import LongfuPic from "../assets/images/LongfuPic.jpg";
-import ReachPic from "../assets/images/ReachPic.JPG";
-import TeviPic from "../assets/images/TeviPic.png";
+import ReachPic from "../assets/images/ReachPic.webp";
+import TeviPic from "../assets/images/TeviPic.webp";
 import abtus_background from "../assets/images/abtus_background.png";
 
 const mentors = [
@@ -156,6 +157,7 @@ function MemberCard({ name, role, photo }) {
 export default function AboutPage() {
   return (
     <div className="font-sans bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white min-h-screen transition-colors duration-300">
+      <SEO title="About Us" description="Learn more about MindStack, a gamified knowledge-sharing developers support platform." />
       {/* HERO */}
 
       <div className="relative h-screen overflow-hidden">
