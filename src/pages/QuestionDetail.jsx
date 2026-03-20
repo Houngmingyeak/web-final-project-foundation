@@ -1,19 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { formatDistanceToNow } from "date-fns";
 import {
   FiArrowLeft,
   FiBookmark,
-  FiThumbsUp,
-  FiThumbsDown,
   FiEdit2,
-  FiTrash2,
   FiMessageSquare,
   FiEye,
   FiAward,
 } from "react-icons/fi";
-import { FaBookmark, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
+import { FaBookmark } from "react-icons/fa";
 import { toast } from "react-toastify";
 import {
   useGetPostByIdQuery,
@@ -24,14 +21,6 @@ import {
   useAddBookmarkMutation,
   useRemoveBookmarkMutation,
 } from "../features/bookmark/bookmarkApi";
-import {
-  useGetVotesByUserQuery,
-  useCreateVoteMutation,
-  useUpdateVoteMutation,
-  useDeleteVoteMutation,
-  VOTE_UP,
-  VOTE_DOWN,
-} from "../features/vote/voteApi";
 import { renderMarkdown } from "../utils/markdownRenderer";
 import {
   selectCurrentUser,
@@ -56,41 +45,6 @@ function Skeleton() {
   );
 }
 
-// ── Vote button component ─────────────────────────────────────────────────────
-function VoteButton({ direction, count, state, onClick, disabled }) {
-  const isUp = direction === "up";
-  const isActive = state === (isUp ? "up" : "down");
-
-  const Icon = isUp
-    ? isActive
-      ? FaThumbsUp
-      : FiThumbsUp
-    : isActive
-      ? FaThumbsDown
-      : FiThumbsDown;
-  const activeClass = isUp
-    ? "bg-emerald-500 text-white border-emerald-500"
-    : "bg-red-500 text-white border-red-500";
-  const hoverClass = isUp
-    ? "hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400"
-    : "hover:border-red-400 hover:text-red-500 dark:hover:text-red-400";
-
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      title={isUp ? "Upvote" : "Downvote"}
-      className={`flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-xl border transition-all duration-200 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed
-        ${isActive
-          ? activeClass
-          : `bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 ${hoverClass}`
-        }`}
-    >
-      <Icon className="w-4 h-4" />
-      <span className="text-[11px] leading-none">{count ?? 0}</span>
-    </button>
-  );
-}
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function QuestionDetailPage() {
@@ -107,56 +61,21 @@ export default function QuestionDetailPage() {
   const { data: bookmarks = [] } = useGetBookmarksQuery(undefined, {
     skip: !isAuthenticated,
   });
-  const { data: userVotesResponse } = useGetVotesByUserQuery(currentUser?.id, {
-    skip: !isAuthenticated || !currentUser?.id,
-  });
-
   // ── Mutations ─────────────────────────────────────────────────────────────
   const [addBookmark, { isLoading: adding }] = useAddBookmarkMutation();
   const [removeBookmark, { isLoading: removing }] = useRemoveBookmarkMutation();
   const [createAnswer, { isLoading: submittingAnswer }] =
     useCreateCommentMutation();
-  const [createVote, { isLoading: votingCreate }] = useCreateVoteMutation();
-  const [updateVote, { isLoading: votingUpdate }] = useUpdateVoteMutation();
-  const [deleteVote, { isLoading: votingDelete }] = useDeleteVoteMutation();
 
   // ── Local state ───────────────────────────────────────────────────────────
   const postIdNum = parseInt(id, 10);
   const isSaved = bookmarks.some((post) => post.id === postIdNum);
-
-  // voteMap: { [postId]: { voteId, direction: 'up'|'down'|null } }
-  const [voteMap, setVoteMap] = useState({});
-
-  // scores: { [postId]: number }  — local optimistic score adjustments
-  const [scoreOverrides, setScoreOverrides] = useState({});
 
   const [answerContent, setAnswerContent] = useState("");
   const [answerCode, setAnswerCode] = useState("");
   const [localError, setLocalError] = useState("");
 
   const answers = currentPost?.comments || [];
-
-  // Parse server votes
-  const serverVotes = Array.isArray(userVotesResponse) ? userVotesResponse : [];
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
-  const getVoteState = (pid) => {
-    // Priority: local optimistic map -> server fetched map
-    if (voteMap[pid]) return voteMap[pid];
-
-    const sVote = serverVotes.find((v) => v.postId === pid);
-    if (sVote) {
-      return { voteId: sVote.id, direction: sVote.voteType === "UpVote" || sVote.voteTypeId === VOTE_UP ? "up" : "down" };
-    }
-    return { voteId: null, direction: null };
-  };
-
-  const isVoting = votingCreate || votingUpdate || votingDelete;
-
-  const scoreFor = (post) => {
-    const override = scoreOverrides[post.id];
-    return override ?? (post.score || 0);
-  };
 
   // ── Bookmark ──────────────────────────────────────────────────────────────
   const handleToggleBookmark = async () => {
@@ -177,89 +96,7 @@ export default function QuestionDetailPage() {
     }
   };
 
-  // ── VOTE HANDLER ──────────────────────────────────────────────────────────
-  const handleVote = useCallback(
-    async (targetPostId, direction) => {
-      if (!isAuthenticated) {
-        toast.error("Please log in to vote");
-        return;
-      }
 
-      const voteTypeId = direction === "up" ? VOTE_UP : VOTE_DOWN;
-      const { voteId, direction: currentDir } = getVoteState(targetPostId);
-      const baseScore =
-        scoreOverrides[targetPostId] ??
-        answers.find((a) => a.id === targetPostId)?.score ??
-        (currentPost?.id === targetPostId ? currentPost.score : 0) ??
-        0;
-
-      try {
-        // Case 1: No existing vote → create new vote
-        if (!voteId) {
-          const result = await createVote({
-            postId: targetPostId,
-            voteTypeId,
-          }).unwrap();
-          setVoteMap((prev) => ({
-            ...prev,
-            [targetPostId]: { voteId: result.id, direction },
-          }));
-          setScoreOverrides((prev) => ({
-            ...prev,
-            [targetPostId]: baseScore + (direction === "up" ? 1 : -1),
-          }));
-          toast.success(direction === "up" ? "👍 Upvoted!" : "👎 Downvoted!");
-        }
-        // Case 2: Clicking the same direction → remove vote (undo)
-        else if (currentDir === direction) {
-          await deleteVote(voteId).unwrap();
-          setVoteMap((prev) => ({
-            ...prev,
-            [targetPostId]: { voteId: null, direction: null },
-          }));
-          setScoreOverrides((prev) => ({
-            ...prev,
-            [targetPostId]: baseScore + (direction === "up" ? -1 : 1),
-          }));
-          toast.info("Vote removed");
-        }
-        // Case 3: Switching direction → update existing vote
-        else {
-          await updateVote({
-            voteId,
-            postId: targetPostId,
-            voteTypeId,
-          }).unwrap();
-          setVoteMap((prev) => ({
-            ...prev,
-            [targetPostId]: { voteId, direction },
-          }));
-          const delta = direction === "up" ? 2 : -2; // flipping direction = ±2
-          setScoreOverrides((prev) => ({
-            ...prev,
-            [targetPostId]: baseScore + delta,
-          }));
-          toast.success(
-            direction === "up"
-              ? "👍 Changed to Upvote"
-              : "👎 Changed to Downvote",
-          );
-        }
-      } catch (err) {
-        toast.error(err?.data?.message || "Failed to register vote");
-      }
-    },
-    [
-      isAuthenticated,
-      voteMap,
-      scoreOverrides,
-      currentPost,
-      answers,
-      createVote,
-      updateVote,
-      deleteVote,
-    ],
-  );
 
   // ── Post answer ───────────────────────────────────────────────────────────
   const handlePostAnswer = async (e) => {
@@ -315,7 +152,7 @@ export default function QuestionDetailPage() {
       </div>
     );
 
-  const questionVote = getVoteState(currentPost.id);
+
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
@@ -408,41 +245,7 @@ export default function QuestionDetailPage() {
                 dangerouslySetInnerHTML={{ __html: renderMarkdown(currentPost.body) }}
               />
 
-              {/* Vote row */}
-              <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wide mr-1">
-                  Vote this question:
-                </span>
-                <VoteButton
-                  direction="up"
-                  count={scoreFor(currentPost)}
-                  state={questionVote.direction}
-                  onClick={() => handleVote(currentPost.id, "up")}
-                  disabled={isVoting}
-                />
-                <VoteButton
-                  direction="down"
-                  count={null}
-                  state={questionVote.direction}
-                  onClick={() => handleVote(currentPost.id, "down")}
-                  disabled={isVoting}
-                />
-                {questionVote.voteId && (
-                  <span className="text-[11px] text-gray-400 dark:text-gray-600 ml-1">
-                    You{" "}
-                    {questionVote.direction === "up" ? "upvoted" : "downvoted"}{" "}
-                    •{" "}
-                    <button
-                      onClick={() =>
-                        handleVote(currentPost.id, questionVote.direction)
-                      }
-                      className="underline hover:text-gray-600 dark:hover:text-gray-400"
-                    >
-                      undo
-                    </button>
-                  </span>
-                )}
-              </div>
+
             </div>
           </div>
 
@@ -454,9 +257,7 @@ export default function QuestionDetailPage() {
             </h2>
 
             <div className="space-y-4">
-              {answers.map((answer) => {
-                const answerVote = getVoteState(answer.id);
-                return (
+              {answers.map((answer) => (
                   <div
                     key={answer.id}
                     className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden"
@@ -464,66 +265,27 @@ export default function QuestionDetailPage() {
                     {/* Matching accent bar on answer cards */}
                     <div className="h-0.5 w-full bg-gray-100 dark:bg-gray-800" />
 
-                    <div className="p-5 sm:p-6 flex items-start gap-4">
-                      {/* Vote column */}
-                      <div className="flex flex-col items-center gap-2 shrink-0">
-                        <VoteButton
-                          direction="up"
-                          count={scoreFor(answer)}
-                          state={answerVote.direction}
-                          onClick={() => handleVote(answer.id, "up")}
-                          disabled={isVoting}
-                        />
-                        <VoteButton
-                          direction="down"
-                          count={null}
-                          state={answerVote.direction}
-                          onClick={() => handleVote(answer.id, "down")}
-                          disabled={isVoting}
-                        />
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div
-                          className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed mb-4 prose prose-sm dark:prose-invert max-w-none"
-                          dangerouslySetInnerHTML={{ __html: renderMarkdown(answer.text) }}
-                        />
-                        <div className="flex items-center justify-between gap-2 flex-wrap pt-3 border-t border-gray-200 dark:border-gray-800">
-                          <div className="text-xs text-gray-400 dark:text-gray-500">
-                            Answered by{" "}
-                            <span className="font-semibold text-gray-600 dark:text-gray-300">
-                              {answer.userDisplayName}
-                            </span>{" "}
-                            •{" "}
-                            {formatDistanceToNow(
-                              new Date(answer.creationDate + "Z"),
-                              { addSuffix: true },
-                            )}
-                          </div>
-                          {answerVote.voteId && (
-                            <span className="text-[10px] text-gray-400 dark:text-gray-600">
-                              You{" "}
-                              {answerVote.direction === "up"
-                                ? "👍 upvoted"
-                                : "👎 downvoted"}{" "}
-                              •{" "}
-                              <button
-                                onClick={() =>
-                                  handleVote(answer.id, answerVote.direction)
-                                }
-                                className="underline hover:text-gray-600"
-                              >
-                                undo
-                              </button>
-                            </span>
+                    <div className="p-5 sm:p-6">
+                      <div
+                        className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed mb-4 prose prose-sm dark:prose-invert max-w-none"
+                        dangerouslySetInnerHTML={{ __html: renderMarkdown(answer.text) }}
+                      />
+                      <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-gray-200 dark:border-gray-800">
+                        <div className="text-xs text-gray-400 dark:text-gray-500">
+                          Answered by{" "}
+                          <span className="font-semibold text-gray-600 dark:text-gray-300">
+                            {answer.userDisplayName}
+                          </span>{" "}
+                          •{" "}
+                          {formatDistanceToNow(
+                            new Date(answer.creationDate + "Z"),
+                            { addSuffix: true },
                           )}
                         </div>
                       </div>
                     </div>
                   </div>
-                );
-              })}
+              ))}
 
               {answers.length === 0 && (
                 <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">

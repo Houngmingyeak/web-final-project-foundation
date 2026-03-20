@@ -3,13 +3,23 @@ import { baseQuery } from '../../utils/apiClient';
 
 const API_BASE_URL = 'https://forum-istad-api.cheat.casa'; // Or fetch from .env
 
+const fixUrl = (url) => {
+  if (!url) return url;
+  if (url.includes('localhost:8070'))
+    return url.replace('http://localhost:8070/api/v1/profile-images', `${API_BASE_URL}/api/v1/media`);
+  if (url.startsWith('/')) return `${API_BASE_URL}${url}`;
+  return url;
+};
+
 const transformProfileImage = (response) => {
-  if (response?.profileImage) {
-    if (response.profileImage.includes('localhost:8070')) {
-      response.profileImage = response.profileImage.replace('http://localhost:8070/api/v1/profile-images', `${API_BASE_URL}/api/v1/media`);
-    } else if (response.profileImage.startsWith('/')) {
-      response.profileImage = `${API_BASE_URL}${response.profileImage}`;
-    }
+  if (response?.profileImage) response.profileImage = fixUrl(response.profileImage);
+  if (response?.coverImage)   response.coverImage   = fixUrl(response.coverImage);
+
+  // Hoist nested user stats to root level
+  if (response?.bookmark?.users) {
+    const u = response.bookmark.users;
+    response.reputation = u.reputation ?? response.reputation;
+    response.views      = u.views      ?? response.views;
   }
   return response;
 };

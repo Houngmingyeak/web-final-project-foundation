@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import Sidebar from "../layout/Sidebar";
 import QuestionCard from "../components/QuestionCard";
-import { useGetPostsQuery } from "../features/post/postsApi";
+import { useGetPostsQuery, useGetPostsSortedByScoreQuery } from "../features/post/postsApi";
 import { formatDistanceToNow } from "date-fns";
 import { useBookmarks } from "../hooks/useBookmarks";
 import { useSearchParams } from "react-router-dom";
@@ -33,6 +33,7 @@ function mapPost(post) {
     id: post.id,
     title: post.title,
     excerpt: post.body,
+    score: post.score ?? 0,
     tags: post.tagResponses?.map((t) => t.tagName) ?? [],
     author: {
       initials,
@@ -54,10 +55,37 @@ export default function QuestionsPage() {
   const { toggleBookmark, isBookmarked } = useBookmarks();
   const [activeTab, setActiveTab] = useState("Newest");
 
-  const { data: posts, isLoading, isError } = useGetPostsQuery();
+  // ── Regular posts list (Newest / Active / Unanswered tabs) ────────────────
+  const { data: posts, isLoading: postsLoading, isError: postsError } = useGetPostsQuery();
+
+  // ── Score-sorted posts from backend (Most Voted tab) ─────────────────────
+  const {
+    data: scorePosts,
+    isLoading: scoreLoading,
+    isError: scoreError,
+  } = useGetPostsSortedByScoreQuery(undefined, {
+    skip: activeTab !== "Most Voted",
+  });
+
+  const isLoading = activeTab === "Most Voted" ? scoreLoading : postsLoading;
+  const isError   = activeTab === "Most Voted" ? scoreError  : postsError;
 
   // Sort / filter based on active tab AND search filter
   const sorted = useMemo(() => {
+    // "Most Voted" — use the dedicated score-sorted endpoint result
+    if (activeTab === "Most Voted") {
+      if (!scorePosts) return [];
+      let list = [...scorePosts];
+      if (searchFilter) {
+        list = list.filter(p =>
+          p.title?.toLowerCase().includes(searchFilter) ||
+          p.body?.toLowerCase().includes(searchFilter) ||
+          p.tagResponses?.some(t => t.tagName.toLowerCase().includes(searchFilter))
+        );
+      }
+      return list; // already sorted by score on the server
+    }
+
     if (!posts) return [];
     let list = [...posts];
 
@@ -79,11 +107,8 @@ export default function QuestionsPage() {
     if (activeTab === "Unanswered") {
       return list.filter((p) => (p.comments?.length ?? 0) === 0);
     }
-    if (activeTab === "Most Voted") {
-      return list.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-    }
     return list;
-  }, [posts, activeTab, searchFilter]);
+  }, [posts, scorePosts, activeTab, searchFilter]);
 
   return (
     <div className="flex bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">

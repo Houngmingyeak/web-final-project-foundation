@@ -23,4 +23,19 @@
   .font-inter {
     font-family: 'Inter', sans-serif;
   }
+
+  /* Hide scrollbar while keeping scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE / Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;             /* Chrome / Safari / Opera */
+  }
+
+  /* Prevent long words from overflowing on mobile */
+  .break-words {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Img from "../assets/istad.png";
 import { CiFacebook, CiLinkedin, CiTwitter } from "react-icons/ci";
 import { PiTelegramLogo } from "react-icons/pi";
@@ -7,8 +7,11 @@ import { FaYoutube, FaInstagram } from "react-icons/fa6";
 import imgMindStack from "../assets/mindstack.png";
 import { Link } from "react-router-dom";
 import { RiTiktokLine } from "react-icons/ri";
+import { TermsModal, CookiesSettingsModal, PrivacySettingsModal } from "./LegalModals";
 
 const Footer = () => {
+  const [activeModal, setActiveModal] = useState(null); // 'terms', 'cookies', 'privacy'
+
   return (
     <footer className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-200 py-12 px-6 md:px-12 lg:px-16 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
@@ -97,20 +100,27 @@ const Footer = () => {
             ©2026 Copyright by MindStack
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-blue-600 dark:text-blue-400">
-            {["Term of Service", "Cookies Settings", "Privacy Settings"].map(
-              (link) => (
-                <a
-                  key={link}
-                  href="#"
-                  className="hover:underline whitespace-nowrap"
-                >
-                  {link}
-                </a>
-              ),
-            )}
+            {[
+              { id: "terms", label: "Term of Service" },
+              { id: "cookies", label: "Cookies Settings" },
+              { id: "privacy", label: "Privacy Settings" },
+            ].map((link) => (
+              <button
+                key={link.id}
+                onClick={() => setActiveModal(link.id)}
+                className="hover:underline whitespace-nowrap bg-transparent border-none cursor-pointer text-blue-600 dark:text-blue-400 font-medium"
+              >
+                {link.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <TermsModal isOpen={activeModal === "terms"} onClose={() => setActiveModal(null)} />
+      <CookiesSettingsModal isOpen={activeModal === "cookies"} onClose={() => setActiveModal(null)} />
+      <PrivacySettingsModal isOpen={activeModal === "privacy"} onClose={() => setActiveModal(null)} />
     </footer>
   );
 };

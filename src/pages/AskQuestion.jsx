@@ -139,10 +139,10 @@ export default function AskQuestion() {
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-gray-900 transition-colors duration-300">
-      <Sidebar />
+      <div className="hidden lg:block shrink-0"><Sidebar /></div>
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+      <main className="flex-1 overflow-y-auto min-w-0">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* Page Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-1">
@@ -157,10 +157,10 @@ export default function AskQuestion() {
             </div>
           </div>
 
-          <div className="flex gap-7 items-start">
+          <div>
             <form
               onSubmit={handleSubmit}
-              className="flex-1 flex flex-col gap-5 min-w-0"
+              className="flex flex-col gap-5"
             >
               {/* Card Container */}
               <div className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden">
@@ -394,7 +394,7 @@ export default function AskQuestion() {
                 </div>
 
                 {/* 4. Submit Row */}
-                <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-gray-900/40">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-4 bg-slate-50 dark:bg-gray-900/40">
                   <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-gray-400 font-medium">
                     +15 XP for asking a question
                   </div>

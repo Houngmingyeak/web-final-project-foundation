@@ -253,7 +253,7 @@ export default function Header() {
         </div>
 
         {/* 2. Global Search Input */}
-        <div className="flex-1 max-w-2xl px-4" ref={searchRef}>
+        <div className="hidden sm:block flex-1 max-w-2xl px-4" ref={searchRef}>
           <div className="relative group">
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 transition-colors" />
             <input
@@ -342,12 +342,12 @@ export default function Header() {
           {isAuthenticated && (
             <Link
               to="/ask"
-              className="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all hover:-translate-y-0.5 shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all hover:-translate-y-0.5 shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
             >
               <span className="text-base leading-none">
                 <SlNote />
               </span>
-              Ask question
+              <span className="hidden sm:inline">Ask question</span>
             </Link>
           )}
 
@@ -420,6 +420,17 @@ export default function Header() {
                   {label}
                 </Link>
               ))}
+
+              {/* Ask Question shortcut in mobile sidebar */}
+              {isAuthenticated && (
+                <Link
+                  to="/ask"
+                  className="flex items-center gap-3 px-4 py-3 mt-2 rounded-xl font-bold text-[15px] bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm shadow-blue-500/20"
+                >
+                  <span className="text-[20px]"><SlNote /></span>
+                  Ask Question
+                </Link>
+              )}
             </nav>
           </div>
         </div>

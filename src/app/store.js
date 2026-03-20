@@ -5,7 +5,7 @@ import { profileApi } from "../features/profile/profileApi";
 import { postsApi } from "../features/post/postsApi";
 import { uploadApi } from "../features/upload/uploadApi";
 import { bookmarkApi } from "../features/bookmark/bookmarkApi";
-import { voteApi } from "../features/vote/voteApi";
+
 import { searchApi } from "../features/search/searchApi";
 
 export const store = configureStore({
@@ -16,7 +16,7 @@ export const store = configureStore({
     [postsApi.reducerPath]: postsApi.reducer,
     [uploadApi.reducerPath]: uploadApi.reducer,
     [bookmarkApi.reducerPath]: bookmarkApi.reducer,
-    [voteApi.reducerPath]: voteApi.reducer,
+
     [searchApi.reducerPath]: searchApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -26,7 +26,7 @@ export const store = configureStore({
       postsApi.middleware,
       uploadApi.middleware,
       bookmarkApi.middleware,
-      voteApi.middleware,
+
       searchApi.middleware
     ),
 });

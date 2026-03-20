@@ -1,5 +1,6 @@
 import { FaRegEye, FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
+import { FiArrowUp } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 function ChatIcon() {
@@ -13,7 +14,7 @@ function EyeIcon() {
 export default function QuestionCard({ question, isBookmarked, onToggleBookmark }) {
   if (!question) return null;
 
-  const { author = {}, comments = 0, views = 0, time = "", id } = question;
+  const { author = {}, comments = 0, views = 0, score, time = "", id } = question;
 
   return (
     <Link to={`/question/${id}`}>
@@ -59,6 +60,14 @@ export default function QuestionCard({ question, isBookmarked, onToggleBookmark 
             </span>
           </div>
           <div className="flex items-center gap-3 sm:gap-4 text-gray-500 dark:text-gray-400 text-[13px] sm:text-[14px]">
+            {score !== undefined && (
+              <span className={`flex items-center gap-0.5 font-semibold shrink-0 ${
+                score > 0 ? "text-emerald-500" : score < 0 ? "text-red-500" : "text-gray-400 dark:text-gray-500"
+              }`}>
+                <FiArrowUp className={`w-3.5 h-3.5 ${score < 0 ? "rotate-180" : ""}`} />
+                {score}
+              </span>
+            )}
             <span className="flex items-center gap-1 shrink-0"><ChatIcon />{comments}</span>
             <span className="flex items-center gap-1 shrink-0">
               <EyeIcon />
