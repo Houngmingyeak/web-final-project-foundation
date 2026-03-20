@@ -1,4 +1,22 @@
 User-agent: *
 Allow: /
+Disallow: /account
+Disallow: /profile
+Disallow: /saves
+Disallow: /ask
 
+# Allow common search engine bots explicitly
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+# Sitemap
 Sitemap: https://www.mindstack.study/sitemap.xml

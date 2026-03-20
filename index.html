@@ -1,35 +1,102 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="https://www.mindstack.study/mindstack.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <title>MindStack | Gamified Q&A and Social Learning Platform for Software Developers</title>
-    <meta name="title" content="MindStack | Gamified Q&A and Social Learning Platform for Software Developers" />
-    <meta name="description" content="MindStack is a gamified Q&A platform addressing coding questions, debugging tips, and software development challenges. Ask questions, earn badges, and level up with fellow developers." />
-    <meta name="keywords" content="MindStack, developer platform, coding help, Q&A, developer community, code challenges, level up, debugging, khmer developers" />
-    <link rel="canonical" href="https://www.mindstack.study/" />
 
+    <!-- ══ Primary SEO ══════════════════════════════════════════════════ -->
+    <title>MindStack | Gamified Q&amp;A and Social Learning Platform for Developers</title>
+    <meta name="title" content="MindStack | Gamified Q&amp;A and Social Learning Platform for Developers" />
+    <meta name="description" content="MindStack is a gamified developer Q&amp;A community where you can ask coding questions, share debugging tips, tackle challenges, and level up your skills. Join thousands of developers in Cambodia and beyond." />
+    <meta name="keywords" content="MindStack, developer forum, Q&amp;A platform, coding questions, programming help, Khmer developers, ISTAD, software development, debugging, code challenges, leaderboard, gamified learning, tech community Cambodia" />
+    <meta name="author" content="MindStack Team — ISTAD" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="MindStack" />
+
+    <!-- ══ Canonical & Language ══════════════════════════════════════════ -->
+    <link rel="canonical" href="https://www.mindstack.study/" />
+    <link rel="alternate" hreflang="en" href="https://www.mindstack.study/" />
+    <link rel="alternate" hreflang="km" href="https://www.mindstack.study/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.mindstack.study/" />
+
+    <!-- ══ Favicon & Icons ═══════════════════════════════════════════════ -->
+    <link rel="icon" type="image/png" href="https://www.mindstack.study/mindstack.png" />
+    <link rel="apple-touch-icon" href="https://www.mindstack.study/mindstack.png" />
+    <link rel="shortcut icon" href="https://www.mindstack.study/mindstack.png" />
+
+    <!-- ══ Open Graph (Facebook / LinkedIn / Discord) ═══════════════════ -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MindStack" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://www.mindstack.study/" />
+    <meta property="og:title" content="MindStack | Ask. Learn. Level Up." />
+    <meta property="og:description" content="A gamified Q&amp;A platform for developers — ask questions, earn badges, crack coding challenges, and climb the leaderboard. Built for Khmer developers and the global tech community." />
+    <meta property="og:image" content="https://www.mindstack.study/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="MindStack — Ask. Learn. Level Up. Gamified Q&amp;A platform for developers" />
+
+    <!-- ══ Twitter Card ═══════════════════════════════════════════════════ -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@mindstackstudy" />
+    <meta name="twitter:creator" content="@mindstackstudy" />
+    <meta name="twitter:url" content="https://www.mindstack.study/" />
+    <meta name="twitter:title" content="MindStack | Ask. Learn. Level Up." />
+    <meta name="twitter:description" content="A gamified Q&amp;A platform for developers — ask questions, earn badges, crack coding challenges, and climb the leaderboard." />
+    <meta name="twitter:image" content="https://www.mindstack.study/og-image.png" />
+    <meta name="twitter:image:alt" content="MindStack — Gamified Q&amp;A for Developers" />
+
+    <!-- ══ Preconnect / DNS-prefetch for performance ══════════════════════ -->
     <link rel="preconnect" href="https://forum-istad-api.cheat.casa" />
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://connect.facebook.net" />
+
+    <!-- ══ Schema.org — WebSite ═══════════════════════════════════════════ -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "MindStack",
+      "alternateName": ["MindStack Study", "MindStack Q&A"],
       "url": "https://www.mindstack.study/",
-      "description": "MindStack is a gamified Q&A platform addressing coding questions, debugging tips, and software development challenges."
+      "description": "MindStack is a gamified Q&A and social learning platform for software developers. Ask coding questions, tackle challenges, earn badges and level up.",
+      "inLanguage": ["en", "km"],
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.mindstack.study/questions?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
     }
     </script>
 
+    <!-- ══ Schema.org — Organization ══════════════════════════════════════ -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "MindStack",
-      "logo": "https://www.mindstack.study/mindstack.png",
       "url": "https://www.mindstack.study/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.mindstack.study/mindstack.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "A gamified Q&A platform for developers — ask questions, earn badges, and level up your skills.",
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Phnom Penh, Cambodia"
+      },
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Street 32",
@@ -37,10 +104,79 @@
         "addressRegion": "Phnom Penh",
         "postalCode": "12000",
         "addressCountry": "KH"
-      }
+      },
+      "sameAs": [
+        "https://github.com/Houngmingyeak/Web-FinalProject-Foundation"
+      ]
     }
     </script>
 
+    <!-- ══ Schema.org — SoftwareApplication ══════════════════════════════ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "MindStack",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "url": "https://www.mindstack.study/",
+      "description": "Gamified Q&A and social learning platform for software developers.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "screenshot": "https://www.mindstack.study/og-image.png"
+    }
+    </script>
+
+    <!-- ══ Schema.org — FAQPage (boosts featured snippets) ═══════════════ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is MindStack?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MindStack is a gamified Q&A platform for software developers where you can ask coding questions, share answers, earn badges, complete challenges, and compete on a leaderboard."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is MindStack free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, MindStack is completely free. Sign up with email, Google, or GitHub and start asking questions and earning badges right away."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who can use MindStack?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MindStack is built for software developers of all skill levels — from beginners learning their first programming language to experienced engineers solving complex problems."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- ══ Google Analytics ════════════════════════════════════════════════ -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YOUR_MEASUREMENT_ID', {
+        page_title: document.title,
+        page_location: window.location.href
+      });
+    </script>
+
+    <!-- ══ Facebook Pixel ═════════════════════════════════════════════════ -->
     <script>
       !function(f,b,e,v,n,t,s)
       {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -50,35 +186,14 @@
       t.src=v;s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
-      
-      // ប្តូរ 'YOUR_FACEBOOK_PIXEL_ID' ជាមួយ ID របស់អ្នក
-      const pixelId = 'YOUR_FACEBOOK_PIXEL_ID'; 
+      const pixelId = 'YOUR_FACEBOOK_PIXEL_ID';
       if (pixelId && pixelId !== 'YOUR_FACEBOOK_PIXEL_ID') {
         fbq('init', pixelId);
         fbq('track', 'PageView');
       }
     </script>
-    
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.mindstack.study/" />
-    <meta property="og:title" content="MindStack | Gamified Q&A Platform for Developers" />
-    <meta property="og:description" content="Ask Questions, Earn Badges, and Level Up with developers worldwide." />
-    <meta property="og:image" content="https://www.mindstack.study/og-image.png" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://www.mindstack.study/" />
-    <meta name="twitter:title" content="MindStack | Gamified Q&A Platform for Developers" />
-    <meta name="twitter:description" content="Ask Questions, Earn Badges, and Level Up with developers worldwide." />
-    <meta name="twitter:image" content="https://www.mindstack.study/og-image.png" />
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_MEASUREMENT_ID"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-YOUR_MEASUREMENT_ID');
-    </script>
-
+    <!-- ══ Theme (flash-free dark mode) ═════════════════════════════════ -->
     <script>
       (function () {
         const savedMode = localStorage.getItem("theme-mode") || "system";

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -39,6 +39,7 @@ export default function Signup() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [register, { isLoading }] = useRegisterMutation();
   const { syncOAuthUser, oauthLoading } = useOAuthSync();
+  const popupPending = useRef(false); // ← prevents double-popup
 
   if (isAuthenticated) {
     return <Navigate to="/questions" replace />;
@@ -82,26 +83,34 @@ export default function Signup() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (popupPending.current) return;
+    popupPending.current = true;
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const success = await syncOAuthUser(result.user, "Google");
       if (success) navigate("/questions");
     } catch (err) {
-      if (err.code === "auth/popup-closed-by-user") return;
+      if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
       toast.error(err?.message || "Signup with Google failed.");
+    } finally {
+      popupPending.current = false;
     }
   };
 
   const handleGithubSignIn = async () => {
+    if (popupPending.current) return;
+    popupPending.current = true;
     try {
       const provider = new GithubAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const success = await syncOAuthUser(result.user, "GitHub");
       if (success) navigate("/questions");
     } catch (err) {
-      if (err.code === "auth/popup-closed-by-user") return;
+      if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
       toast.error(err?.message || "Signup with GitHub failed.");
+    } finally {
+      popupPending.current = false;
     }
   };
 
@@ -119,9 +128,9 @@ export default function Signup() {
         <div className="flex gap-4 mb-6">
           <button
             type="button"
-            disabled={oauthLoading === "google"}
+            disabled={oauthLoading === "google" || popupPending.current}
             className={`bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center gap-3 w-full py-3 rounded-lg hover:shadow-md hover:bg-sky-50 dark:hover:bg-sky-800/30 transition ${
-              oauthLoading === "google" ? "opacity-50 cursor-not-allowed" : ""
+              oauthLoading === "google" || popupPending.current ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={handleGoogleSignIn}
           >
@@ -133,9 +142,9 @@ export default function Signup() {
 
           <button
             type="button"
-            disabled={oauthLoading === "github"}
+            disabled={oauthLoading === "github" || popupPending.current}
             className={`bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center gap-3 w-full py-3 rounded-lg hover:shadow-md hover:bg-sky-50 dark:hover:bg-sky-800/30 transition ${
-              oauthLoading === "github" ? "opacity-50 cursor-not-allowed" : ""
+              oauthLoading === "github" || popupPending.current ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={handleGithubSignIn}
           >

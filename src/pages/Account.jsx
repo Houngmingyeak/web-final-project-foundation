@@ -219,10 +219,10 @@ export default function Account() {
   const initials = profile.displayName?.slice(0, 2).toUpperCase() ?? "U";
 
   const stats = [
-    { icon: FiHelpCircle,    label: "Questions",     value: questions.length,         bg: "bg-blue-500",    light: "bg-blue-50 dark:bg-blue-500/10",   text: "text-blue-600 dark:text-blue-400" },
-    { icon: FiMessageSquare, label: "Answers",        value: comments.length,          bg: "bg-purple-500",  light: "bg-purple-50 dark:bg-purple-500/10", text: "text-purple-600 dark:text-purple-400" },
-    { icon: FiStar,          label: "Reputation",     value: profile?.reputation ?? 0, bg: "bg-amber-500",   light: "bg-amber-50 dark:bg-amber-500/10",   text: "text-amber-600 dark:text-amber-400" },
-    { icon: FiEye,           label: "Profile Views",  value: profile?.views ?? 0,      bg: "bg-emerald-500", light: "bg-emerald-50 dark:bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400" },
+    { icon: FiHelpCircle,    label: "Questions",    value: questions.length,         bg: "bg-blue-500",    text: "text-blue-600 dark:text-blue-400" },
+    { icon: FiMessageSquare, label: "Answers",       value: comments.length,          bg: "bg-purple-500",  text: "text-purple-600 dark:text-purple-400" },
+    { icon: FiStar,          label: "Reputation",    value: profile?.reputation ?? 0, bg: "bg-amber-500",   text: "text-amber-600 dark:text-amber-400" },
+    { icon: FiEye,           label: "Profile Views", value: profile?.views ?? 0,      bg: "bg-emerald-500", text: "text-emerald-600 dark:text-emerald-400" },
   ];
 
   return (
@@ -321,7 +321,7 @@ export default function Account() {
           ══════════════════════════════════════════════════════════════ */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
             {stats.map((s) => (
-              <div key={s.label} className={`${s.light} rounded-2xl px-4 py-5 flex flex-col gap-2`}>
+              <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl px-4 py-5 flex flex-col gap-2">
                 <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center`}>
                   <s.icon className="w-4.5 h-4.5 text-white" />
                 </div>

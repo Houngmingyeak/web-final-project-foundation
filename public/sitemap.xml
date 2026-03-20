@@ -1,28 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Home -->
   <url>
     <loc>https://www.mindstack.study/</loc>
-    <priority>1.0</priority>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.mindstack.study/og-image.png</image:loc>
+      <image:title>MindStack — Ask. Learn. Level Up.</image:title>
+    </image:image>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.mindstack.study/" />
   </url>
+
+  <!-- Questions -->
   <url>
     <loc>https://www.mindstack.study/questions</loc>
-    <priority>0.8</priority>
-    <changefreq>daily</changefreq>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.95</priority>
   </url>
-  <url>
-    <loc>https://www.mindstack.study/challenges</loc>
-    <priority>0.8</priority>
-    <changefreq>weekly</changefreq>
-  </url>
+
+  <!-- Leaderboard -->
   <url>
     <loc>https://www.mindstack.study/leaderboard</loc>
-    <priority>0.7</priority>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.85</priority>
   </url>
+
+  <!-- Challenges -->
+  <url>
+    <loc>https://www.mindstack.study/challenges</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- About Us -->
   <url>
     <loc>https://www.mindstack.study/about-us</loc>
-    <priority>0.5</priority>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
   </url>
+
+  <!-- Login -->
+  <url>
+    <loc>https://www.mindstack.study/login</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.40</priority>
+  </url>
+
+  <!-- Signup -->
+  <url>
+    <loc>https://www.mindstack.study/signup</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.40</priority>
+  </url>
+
 </urlset>

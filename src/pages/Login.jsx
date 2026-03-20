@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -52,6 +52,7 @@ export default function Login() {
 
   const [login, { isLoading }] = useLoginMutation();
   const { syncOAuthUser, oauthLoading } = useOAuthSync();
+  const popupPending = useRef(false); // ← prevents double-popup
 
   if (isAuthenticated) {
     return <Navigate to="/questions" replace />;
@@ -81,35 +82,39 @@ export default function Login() {
 
   // --- Google Sign In ---
   const handleGoogleSignIn = async () => {
+    if (popupPending.current) return;
+    popupPending.current = true;
     try {
       const provider = new GoogleAuthProvider();
-      // Add scopes to ensure email is retrieved
       provider.addScope('email');
       provider.addScope('profile');
-      
       const result = await signInWithPopup(auth, provider);
       const success = await syncOAuthUser(result.user, "Google");
       if (success) navigate("/questions");
     } catch (err) {
-      if (err.code === "auth/popup-closed-by-user") return;
+      if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
       toast.error(err?.message || "Login with Google failed.");
+    } finally {
+      popupPending.current = false;
     }
   };
 
   // --- GitHub Sign In ---
   const handleGithubSignIn = async () => {
+    if (popupPending.current) return;
+    popupPending.current = true;
     try {
       const provider = new GithubAuthProvider();
-      // Request permission to view email and Profile
       provider.addScope("user:email");
       provider.addScope("read:user");
-
       const result = await signInWithPopup(auth, provider);
       const success = await syncOAuthUser(result.user, "GitHub");
       if (success) navigate("/questions");
     } catch (err) {
-      if (err.code === "auth/popup-closed-by-user") return;
+      if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
       toast.error("GitHub Login failed: " + err.message);
+    } finally {
+      popupPending.current = false;
     }
   };
 
@@ -127,7 +132,7 @@ export default function Login() {
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <button
             type="button"
-            disabled={!!oauthLoading}
+            disabled={!!oauthLoading || popupPending.current}
             onClick={handleGoogleSignIn}
             className={`w-full h-12 rounded-xl font-semibold bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 hover:bg-sky-200 transition flex items-center justify-center gap-3 disabled:opacity-50`}
           >
@@ -137,7 +142,7 @@ export default function Login() {
           
           <button
             type="button"
-            disabled={!!oauthLoading}
+            disabled={!!oauthLoading || popupPending.current}
             onClick={handleGithubSignIn}
             className={`w-full h-12 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 transition flex items-center justify-center gap-3 disabled:opacity-50`}
           >
