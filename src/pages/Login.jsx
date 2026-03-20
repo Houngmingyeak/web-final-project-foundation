@@ -13,6 +13,7 @@ import { selectIsAuthenticated } from "../features/auth/authSlice";
 import { useOAuthSync } from "../hooks/useOAuthSync";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import SEO from "../components/SEO";
 
 function EyeIcon({ visible }) {
   const strokeClass = "stroke-gray-600 dark:stroke-gray-300";
@@ -120,6 +121,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 transition-colors duration-300 p-4">
+      <SEO
+        title="Login"
+        description="Sign in to MindStack with email, Google, or GitHub. Access your developer Q&A account, track your questions, and continue leveling up."
+        keywords="MindStack login, developer login, sign in, Google login, GitHub login"
+      />
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-[520px] p-8 md:p-12 transition-colors duration-300">
         <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
           Login To Your Account

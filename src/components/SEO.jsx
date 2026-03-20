@@ -1,41 +1,59 @@
 import { useEffect } from "react";
 
+/**
+ * SEO component — updates <title> and key meta tags per page.
+ * Usage: <SEO title="Questions" description="..." keywords="..." />
+ */
 export default function SEO({ title, description, keywords }) {
   useEffect(() => {
+    // ── Snapshot previous values for cleanup ──────────────────────────
     const previousTitle = document.title;
-    let metaDesc = document.querySelector('meta[name="description"]');
-    let ogDesc = document.querySelector('meta[property="og:description"]');
-    let ogTitle = document.querySelector('meta[property="og:title"]');
-    let metaKeywords = document.querySelector('meta[name="keywords"]');
-    let canonical = document.querySelector('link[rel="canonical"]');
+    const metaDesc      = document.querySelector('meta[name="description"]');
+    const metaTitle     = document.querySelector('meta[name="title"]');
+    const ogTitle       = document.querySelector('meta[property="og:title"]');
+    const ogDesc        = document.querySelector('meta[property="og:description"]');
+    const ogUrl         = document.querySelector('meta[property="og:url"]');
+    const twTitle       = document.querySelector('meta[name="twitter:title"]');
+    const twDesc        = document.querySelector('meta[name="twitter:description"]');
+    const twUrl         = document.querySelector('meta[name="twitter:url"]');
+    const metaKeywords  = document.querySelector('meta[name="keywords"]');
+    const canonical     = document.querySelector('link[rel="canonical"]');
 
-    const previousDesc = metaDesc ? metaDesc.getAttribute("content") : "";
-    const previousKeywords = metaKeywords ? metaKeywords.getAttribute("content") : "";
+    const prevDesc     = metaDesc?.getAttribute("content") ?? "";
+    const prevKeywords = metaKeywords?.getAttribute("content") ?? "";
 
-    if (canonical) {
-      canonical.setAttribute("href", window.location.href);
-    }
+    // ── Canonical & OG URL → current page ─────────────────────────────
+    const currentUrl = window.location.href;
+    canonical?.setAttribute("href", currentUrl);
+    ogUrl?.setAttribute("content", currentUrl);
+    twUrl?.setAttribute("content", currentUrl);
 
+    // ── Title (50-70 chars: "Page | MindStack — Gamified Q&A for Devs") ─
     if (title) {
-      const fullTitle = `${title} | MindStack`;
+      const fullTitle = `${title} | MindStack — Gamified Q&A for Developers`;
       document.title = fullTitle;
-      if (ogTitle) ogTitle.setAttribute("content", fullTitle);
+      metaTitle?.setAttribute("content", fullTitle);
+      ogTitle?.setAttribute("content", fullTitle);
+      twTitle?.setAttribute("content", `${title} | MindStack`);
     }
 
+    // ── Description ────────────────────────────────────────────────────
     if (description) {
-      if (metaDesc) metaDesc.setAttribute("content", description);
-      if (ogDesc) ogDesc.setAttribute("content", description);
+      metaDesc?.setAttribute("content", description);
+      ogDesc?.setAttribute("content", description);
+      twDesc?.setAttribute("content", description);
     }
 
+    // ── Keywords ───────────────────────────────────────────────────────
     if (keywords) {
-      if (metaKeywords) metaKeywords.setAttribute("content", keywords);
+      metaKeywords?.setAttribute("content", keywords);
     }
 
-    // Cleanup when unmounting or changing page to fallback to index defaults
+    // ── Cleanup: restore defaults when navigating away ─────────────────
     return () => {
       document.title = previousTitle;
-      if (metaDesc && previousDesc) metaDesc.setAttribute("content", previousDesc);
-      if (metaKeywords && previousKeywords) metaKeywords.setAttribute("content", previousKeywords);
+      if (metaDesc && prevDesc)     metaDesc.setAttribute("content", prevDesc);
+      if (metaKeywords && prevKeywords) metaKeywords.setAttribute("content", prevKeywords);
     };
   }, [title, description, keywords]);
 

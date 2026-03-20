@@ -14,6 +14,7 @@ import { selectIsAuthenticated } from "../features/auth/authSlice";
 import { useOAuthSync } from "../hooks/useOAuthSync";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import SEO from "../components/SEO";
 
 // Icons
 function EyeIcon({ visible }) {
@@ -116,6 +117,11 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <SEO
+        title="Sign Up"
+        description="Create a free MindStack account and join a gamified developer community. Sign up with email, Google, or GitHub to start asking questions and earning badges."
+        keywords="MindStack signup, create developer account, register, join developer community, free signup"
+      />
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md w-[540px] p-10">
         <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
           Create an account

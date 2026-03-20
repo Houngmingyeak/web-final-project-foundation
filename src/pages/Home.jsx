@@ -37,7 +37,11 @@ const HomePage = () => {
 
   return (
     <main className="bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-white transition-colors duration-300">
-      <SEO title="Home" description="MindStack is a gamified Q&A platform for developers. Level up together by asking questions, sharing answers, and earning points." />
+      <SEO
+        title="Home"
+        description="MindStack is a free gamified Q&A platform for software developers. Ask programming questions, share answers, earn badges, tackle code challenges, and climb the leaderboard. Built by ISTAD in Phnom Penh, Cambodia."
+        keywords="MindStack home, developer Q&A, coding questions, gamified learning, ISTAD, Phnom Penh, developer community"
+      />
       {/* HERO */}
       <section className="relative text-center py-24 px-6 overflow-hidden">
         <img
