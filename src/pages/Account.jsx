@@ -53,7 +53,7 @@ import {
 import AccountProfileDropdown from "../components/AccountProfileDropdown";
 
 import Sidebar from "../layout/Sidebar";
-import mindstack from "../assets/Mindstack.png";
+import mindstack from "../assets/mindstack.png";
 
 // ── Navigation Item ───────────────────────────────────────────────────────
 function NavItem({ icon: Icon, label, to, active, onClick }) {

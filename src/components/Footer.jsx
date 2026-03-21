@@ -1,5 +1,5 @@
 import React from "react";
-import Img from "../assets/Istad.png";
+import Img from "../assets/istad.png";
 import { CiFacebook, CiLinkedin } from "react-icons/ci";
 import { PiTelegramLogo } from "react-icons/pi";
 import { CgMail } from "react-icons/cg";
