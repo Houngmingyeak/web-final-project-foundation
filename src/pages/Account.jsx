@@ -264,7 +264,7 @@ export default function Account() {
     if (!selectedFile) return;
     try {
       await uploadImage(selectedFile).unwrap();
-      toast.success("Profile photo updated! ✨");
+      toast.success("Profile photo updated!");
       closeAvatarModal();
     } catch (err) {
       toast.error(err?.data?.message || "Upload failed");
@@ -278,7 +278,7 @@ export default function Account() {
         username: formData.displayName,
         bio: formData.bio,
       }).unwrap();
-      toast.success("Profile saved! 🚀");
+      toast.success("Profile saved!");
       setIsEditing(false);
     } catch (err) {
       toast.error(err?.data?.message || "Update failed");
@@ -312,7 +312,7 @@ export default function Account() {
         newPassword,
         confirmedNewPassword,
       }).unwrap();
-      toast.success("Password changed successfully! 🔒");
+      toast.success("Password changed successfully!");
       closePwModal();
     } catch (err) {
       toast.error(
