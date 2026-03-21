@@ -89,7 +89,7 @@ export default function QuestionDetailPage() {
         toast.success("Removed from saves");
       } else {
         await addBookmark(postIdNum).unwrap();
-        toast.success("✅ Saved to bookmarks!");
+        toast.success("Saved to bookmarks!");
       }
     } catch {
       toast.error("Failed to update bookmark");
@@ -123,7 +123,7 @@ export default function QuestionDetailPage() {
         return;
       }
       await createAnswer({ postId: postIdNum, text: textToPost }).unwrap();
-      toast.success("Answer posted! 🎉");
+      toast.success("Answer posted!");
       setAnswerContent("");
       setAnswerCode("");
     } catch (err) {

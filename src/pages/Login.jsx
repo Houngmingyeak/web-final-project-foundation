@@ -74,7 +74,7 @@ export default function Login() {
         email: formData.email,
         password: formData.password,
       }).unwrap();
-      toast.success("Login successful! 🎉");
+      toast.success("Login successful!");
       navigate("/questions");
     } catch (err) {
       toast.error(err?.data?.message || "Login failed");

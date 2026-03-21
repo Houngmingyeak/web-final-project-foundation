@@ -76,7 +76,7 @@ export default function Signup() {
         password,
         confirmPassword,
       }).unwrap();
-      toast.success("Account created successfully! ✅");
+      toast.success("Account created successfully!");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       toast.error(err?.data?.message || "Registration failed");

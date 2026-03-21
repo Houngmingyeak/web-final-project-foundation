@@ -78,7 +78,7 @@ export function useOAuthSync() {
             }
 
             if (loggedIn) {
-                toast.success(`Login with ${providerName} successful! 🎉`);
+                toast.success(`Login with ${providerName} successful!`);
                 setLoading('');
                 return true;
             }
@@ -101,7 +101,7 @@ export function useOAuthSync() {
                     // After Register, Login with Unified Password
                     await login({ email, password: passwordUnified }).unwrap();
                     
-                    toast.success(`Account created and login with ${providerName} completed! 🎉`);
+                    toast.success(`Account created and login with ${providerName} completed!`);
                     setLoading('');
                     return true;
                 } catch (regErr) {
@@ -111,7 +111,7 @@ export function useOAuthSync() {
                     // If still Error 409, it means this Email was already Registered with normal Password (Manual)
                     if (regErr.status === 409 || msg.toLowerCase().includes('email')) {
                         toast.warning(`This email already exists with a different password. Please use a different email or Login normally.`);
-                        toast.info(`💡 If you previously used another social provider (e.g. Google/GitHub), please login with that provider first so we can sync your accounts.`, { autoClose: 8000 });
+                        toast.info(`If you previously used another social provider (e.g. Google/GitHub), please login with that provider first so we can sync your accounts.`, { autoClose: 8000 });
                     } else {
                         toast.error(msg || `Technical issue with ${providerName}`);
                     }

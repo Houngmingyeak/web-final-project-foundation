@@ -94,7 +94,7 @@ export default function AskQuestion() {
         return [...prev, { id: newTag.id, tagName: newTag.tagName }];
       });
       setNewTagInput("");
-      toast.success(`✅ Tag "${newTag.tagName}" created and selected!`);
+      toast.success(`Tag "${newTag.tagName}" created and selected!`);
     } catch (err) {
       toast.error(
         err?.data?.message ?? "Failed to create tag. It may already exist.",
@@ -128,7 +128,7 @@ export default function AskQuestion() {
         postTypeId: 1,
         tagIds: tags.map((t) => t.id),
       }).unwrap();
-      toast.success("🎉 Question posted successfully! +15 XP");
+      toast.success("Question posted successfully! +15 XP");
       navigate("/questions");
     } catch (err) {
       toast.error(
