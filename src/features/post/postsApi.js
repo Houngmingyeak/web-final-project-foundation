@@ -68,6 +68,29 @@ export const postsApi = createApi({
         { type: 'Post', id: 'SCORE' },
       ],
     }),
+    updatePost: builder.mutation({
+      query: ({ id, ...patch }) => ({
+        url: `/posts/${id}`,
+        method: 'PUT',
+        body: patch,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Post', id },
+        { type: 'Post', id: 'LIST' },
+        { type: 'Post', id: 'SCORE' }
+      ]
+    }),
+    deletePost: builder.mutation({
+      query: (id) => ({
+        url: `/posts/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Post', id },
+        { type: 'Post', id: 'LIST' },
+        { type: 'Post', id: 'SCORE' }
+      ]
+    }),
   }),
 });
 
@@ -80,4 +103,6 @@ export const {
   useCreateTagMutation,
   useCreatePostMutation,
   useCreateCommentMutation,
+  useUpdatePostMutation,
+  useDeletePostMutation,
 } = postsApi;

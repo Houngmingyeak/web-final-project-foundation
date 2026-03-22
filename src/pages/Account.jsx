@@ -202,6 +202,9 @@ export default function Account() {
     useUpdatePasswordMutation();
   const { data: bookmarks = [] } = useGetBookmarksQuery();
 
+  // Avatar refresh key for cache busting
+  const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
+
   // Process profile image
   let profilImageSplit = profile?.profileImage;
   if (profilImageSplit?.includes("localhost:8070")) {
@@ -209,6 +212,11 @@ export default function Account() {
       "http://localhost:8070/api/v1/profile-images",
       "https://forum-istad-api.cheat.casa/api/v1/media",
     );
+  }
+  
+  // Append cache busting key if image exists
+  if (profilImageSplit) {
+    profilImageSplit = `${profilImageSplit}?t=${avatarRefreshKey}`;
   }
   const avatarSrc = useAuthImage(profilImageSplit);
 
@@ -264,6 +272,7 @@ export default function Account() {
     if (!selectedFile) return;
     try {
       await uploadImage(selectedFile).unwrap();
+      setAvatarRefreshKey(prev => prev + 1); // Trigger image refetch
       toast.success("Profile photo updated!");
       closeAvatarModal();
     } catch (err) {

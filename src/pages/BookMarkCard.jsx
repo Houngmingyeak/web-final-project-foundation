@@ -7,6 +7,8 @@ import {
   useGetBookmarksQuery,
   useRemoveBookmarkMutation,
 } from "../features/bookmark/bookmarkApi";
+import { useGetProfileQuery, useGetUserByIdQuery } from "../features/profile/profileApi";
+import { useAuthImage } from "../hooks/useAuthImage";
 import { selectCurrentUser } from "../features/auth/authSlice";
 import { FaBookmark } from "react-icons/fa";
 import {
@@ -30,6 +32,26 @@ const TAG_PALETTE = [
   "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
   "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300",
 ];
+
+// ── BookmarkAuthorAvatar ───────────────────────────────────────────────────
+function BookmarkAuthorAvatar({ ownerId, displayName }) {
+  const { data: userProfile } = useGetUserByIdQuery(ownerId, {
+    skip: !ownerId,
+  });
+  const avatarSrc = useAuthImage(userProfile?.profileImage);
+
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    if (avatarSrc) setImgError(false);
+  }, [avatarSrc]);
+
+  return avatarSrc && !imgError ? (
+    <img src={avatarSrc} alt={displayName} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+  ) : (
+    <>{displayName?.slice(0, 2).toUpperCase() ?? "??"}</>
+  );
+}
 
 // ── Skeleton ───────────────────────────────────────────────────────────────
 function Skeleton() {
@@ -131,9 +153,9 @@ function BookmarkItem({ post, onRemove, removing }) {
         <div className="flex items-center gap-2">
           <div
             className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900/40 flex items-center
-            justify-center text-blue-600 dark:text-blue-400 text-[10px] font-bold shrink-0"
+            justify-center text-blue-600 dark:text-blue-400 text-[10px] font-bold shrink-0 overflow-hidden"
           >
-            {post.ownerDisplayName?.slice(0, 2).toUpperCase() ?? "??"}
+            <BookmarkAuthorAvatar ownerId={post.ownerId} displayName={post.ownerDisplayName} />
           </div>
           <span className="text-[13px] text-slate-600 dark:text-gray-300 font-medium">
             {post.ownerDisplayName ?? "Unknown"}
@@ -172,6 +194,9 @@ export default function BookmarkCard() {
   const currentUser = useSelector(selectCurrentUser);
   const [search, setSearch] = useState("");
   const [removingId, setRemovingId] = useState(null);
+
+  const { data: profile } = useGetProfileQuery(undefined, { skip: !currentUser });
+  const avatarSrc = useAuthImage(profile?.profileImage ?? null);
 
   // bookmarks = array of full post objects (from bookMarkList)
   const {
@@ -246,9 +271,17 @@ export default function BookmarkCard() {
           <div className="flex items-center gap-4">
             <div
               className="w-14 h-14 rounded-xl bg-linear-to-br from-blue-500 to-violet-500
-              flex items-center justify-center font-bold text-white text-lg shrink-0"
+              flex items-center justify-center font-bold text-white text-lg shrink-0 overflow-hidden"
             >
-              {currentUser.displayName?.slice(0, 2).toUpperCase() ?? "ME"}
+              {avatarSrc ? (
+                <img
+                  src={avatarSrc}
+                  alt="User Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                currentUser.displayName?.slice(0, 2).toUpperCase() ?? "ME"
+              )}
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">

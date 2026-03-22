@@ -84,15 +84,22 @@ export default function SearchPage() {
             {results.map((question) => (
               <QuestionCard
                 key={question.id}
-                id={question.id}
-                title={question.title}
-                description={question.description}
-                author={question.authorName}
-                tags={question.tags || []}
-                createdAt={question.createdAt}
-                viewCount={question.viewCount || 0}
-                answerCount={question.answers || 0}
-                status={question.status || "open"}
+                question={{
+                  id: question.id,
+                  title: question.title,
+                  excerpt: question.description || question.body,
+                  author: {
+                    id: question.ownerId || 0,
+                    name: question.authorName || question.ownerDisplayName || "Unknown",
+                    initials: (question.authorName || question.ownerDisplayName || "??").slice(0, 2).toUpperCase(),
+                    color: "bg-blue-500"
+                  },
+                  tags: question.tags || question.tagResponses?.map(t => t.tagName) || [],
+                  time: question.createdAt || question.creationDate || "recently",
+                  views: question.viewCount || 0,
+                  comments: question.answers || question.comments?.length || 0,
+                  score: question.score || 0
+                }}
               />
             ))}
           </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -15,6 +15,8 @@ import { toast } from "react-toastify";
 import {
   useGetPostByIdQuery,
   useCreateCommentMutation,
+  useUpdatePostMutation,
+  useDeletePostMutation,
 } from "../features/post/postsApi";
 import {
   useGetBookmarksQuery,
@@ -49,6 +51,7 @@ function Skeleton() {
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function QuestionDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const currentUser = useSelector(selectCurrentUser);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
@@ -66,6 +69,8 @@ export default function QuestionDetailPage() {
   const [removeBookmark, { isLoading: removing }] = useRemoveBookmarkMutation();
   const [createAnswer, { isLoading: submittingAnswer }] =
     useCreateCommentMutation();
+  const [updatePost, { isLoading: updating }] = useUpdatePostMutation();
+  const [deletePost, { isLoading: deleting }] = useDeletePostMutation();
 
   // ── Local state ───────────────────────────────────────────────────────────
   const postIdNum = parseInt(id, 10);
@@ -75,7 +80,12 @@ export default function QuestionDetailPage() {
   const [answerCode, setAnswerCode] = useState("");
   const [localError, setLocalError] = useState("");
 
+  const [isEditingQuestion, setIsEditingQuestion] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editBody, setEditBody] = useState("");
+
   const answers = currentPost?.comments || [];
+  const isOwner = currentUser && currentPost && currentUser.displayName?.toLowerCase() === currentPost.ownerDisplayName?.toLowerCase();
 
   // ── Bookmark ──────────────────────────────────────────────────────────────
   const handleToggleBookmark = async () => {
@@ -135,6 +145,45 @@ export default function QuestionDetailPage() {
     }
   };
 
+  // ── Update question ───────────────────────────────────────────────────────
+  const handleUpdateQuestion = async (e) => {
+    e.preventDefault();
+    if (!editTitle.trim() || !editBody.trim()) {
+      toast.error("Title and description are required.");
+      return;
+    }
+    try {
+      const updatePayload = {
+        id: postIdNum,
+        title: editTitle.trim(),
+        body: editBody.trim(),
+        postTypeId: currentPost.postTypeId || 1,
+        tagIds: currentPost.tagResponses?.map(tag => tag.id) || []
+      };
+      if (currentPost.parentId) {
+        updatePayload.parentId = currentPost.parentId;
+      }
+
+      await updatePost(updatePayload).unwrap();
+      toast.success("Question updated!");
+      setIsEditingQuestion(false);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update question");
+    }
+  };
+
+  // ── Delete question ───────────────────────────────────────────────────────
+  const handleDeleteQuestion = async () => {
+    if (!window.confirm("Are you sure you want to delete this question? This action cannot be undone.")) return;
+    try {
+      await deletePost(postIdNum).unwrap();
+      toast.success("Question deleted!");
+      navigate("/questions");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete question");
+    }
+  };
+
   // ── Render guards ─────────────────────────────────────────────────────────
   if (postLoading) return <Skeleton />;
   if (postError || !currentPost)
@@ -181,28 +230,61 @@ export default function QuestionDetailPage() {
             <div className="p-6 sm:p-8">
               {/* Title row */}
               <div className="flex items-start justify-between gap-3 mb-5">
-                <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight flex-1">
-                  {currentPost.title}
-                </h1>
+                {isEditingQuestion ? (
+                   <input
+                     type="text"
+                     value={editTitle}
+                     onChange={(e) => setEditTitle(e.target.value)}
+                     className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-bold mb-2 outline-none focus:ring-2 focus:ring-blue-500"
+                   />
+                ) : (
+                   <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white leading-tight flex-1">
+                     {currentPost.title}
+                   </h1>
+                )}
 
-                {/* Bookmark */}
-                <button
-                  onClick={handleToggleBookmark}
-                  disabled={adding || removing}
-                  title={isSaved ? "Remove from saves" : "Save question"}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold shrink-0 border transition-all
-                  ${isSaved
-                      ? "bg-amber-50 dark:bg-amber-900/30 text-amber-500 border-amber-300 dark:border-amber-700"
-                      : "bg-gray-50 dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700 hover:text-amber-500 hover:border-amber-300"
-                    } disabled:opacity-50`}
-                >
-                  {isSaved ? (
-                    <FaBookmark className="w-4 h-4" />
-                  ) : (
-                    <FiBookmark className="w-4 h-4" />
+                <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                  {/* Owner Controls */}
+                  {isOwner && !isEditingQuestion && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setEditTitle(currentPost.title);
+                          setEditBody(currentPost.body);
+                          setIsEditingQuestion(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-500 border border-blue-200 dark:border-blue-700 hover:text-blue-600 disabled:opacity-50"
+                      >
+                        <FiEdit2 className="w-4 h-4" /> Edit
+                      </button>
+                      <button
+                        onClick={handleDeleteQuestion}
+                        disabled={deleting}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-red-50 dark:bg-red-900/30 text-red-500 border border-red-200 dark:border-red-700 hover:text-red-600 disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </>
                   )}
-                  {isSaved ? "Saved" : "Save"}
-                </button>
+                  {/* Bookmark */}
+                  <button
+                    onClick={handleToggleBookmark}
+                    disabled={adding || removing}
+                    title={isSaved ? "Remove from saves" : "Save question"}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold shrink-0 border transition-all
+                    ${isSaved
+                        ? "bg-amber-50 dark:bg-amber-900/30 text-amber-500 border-amber-300 dark:border-amber-700"
+                        : "bg-gray-50 dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700 hover:text-amber-500 hover:border-amber-300"
+                      } disabled:opacity-50`}
+                  >
+                    {isSaved ? (
+                      <FaBookmark className="w-4 h-4" />
+                    ) : (
+                      <FiBookmark className="w-4 h-4" />
+                    )}
+                    {isSaved ? "Saved" : "Save"}
+                  </button>
+                </div>
               </div>
 
               {/* Meta */}
@@ -240,10 +322,37 @@ export default function QuestionDetailPage() {
               </div>
 
               {/* Body */}
-              <div
-                className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed mb-6 prose prose-sm dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(currentPost.body) }}
-              />
+              {isEditingQuestion ? (
+                 <div className="flex flex-col gap-3">
+                   <textarea
+                     value={editBody}
+                     onChange={(e) => setEditBody(e.target.value)}
+                     rows={10}
+                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white mb-2 outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                   />
+                   <div className="flex gap-2">
+                     <button
+                       onClick={handleUpdateQuestion}
+                       disabled={updating}
+                       className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold rounded-xl transition-all"
+                     >
+                       {updating ? "Saving..." : "Save Changes"}
+                     </button>
+                     <button
+                       onClick={() => setIsEditingQuestion(false)}
+                       disabled={updating}
+                       className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-bold rounded-xl transition-all"
+                     >
+                       Cancel
+                     </button>
+                   </div>
+                 </div>
+              ) : (
+                <div
+                  className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed mb-6 prose prose-sm dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: renderMarkdown(currentPost.body) }}
+                />
+              )}
 
 
             </div>

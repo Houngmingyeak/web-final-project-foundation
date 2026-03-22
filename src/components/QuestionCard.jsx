@@ -1,7 +1,10 @@
+import React, { useState } from "react";
 import { FaRegEye, FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { FiArrowUp } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { useGetUserByIdQuery } from "../features/profile/profileApi";
+import { useAuthImage } from "../hooks/useAuthImage";
 
 function ChatIcon() {
   return <IoChatboxEllipsesOutline />;
@@ -15,6 +18,17 @@ export default function QuestionCard({ question, isBookmarked, onToggleBookmark 
   if (!question) return null;
 
   const { author = {}, comments = 0, views = 0, score, time = "", id } = question;
+
+  const { data: userProfile } = useGetUserByIdQuery(author.id, {
+    skip: !author.id,
+  });
+  const avatarSrc = useAuthImage(userProfile?.profileImage);
+
+  const [imgError, setImgError] = useState(false);
+
+  React.useEffect(() => {
+    if (avatarSrc) setImgError(false);
+  }, [avatarSrc]);
 
   return (
     <Link to={`/question/${id}`}>
@@ -52,8 +66,17 @@ export default function QuestionCard({ question, isBookmarked, onToggleBookmark 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
           <div className="flex items-center gap-2">
             <span className={`w-6 h-6 rounded-full ${author.color || "bg-gray-400"} 
-                             flex items-center justify-center text-[13px] font-bold text-white shrink-0`}>
-              {author.initials || "?"}
+                             flex items-center justify-center text-[13px] font-bold text-white shrink-0 overflow-hidden`}>
+              {avatarSrc && !imgError ? (
+                <img 
+                  src={avatarSrc} 
+                  alt={author.name} 
+                  className="w-full h-full object-cover" 
+                  onError={() => setImgError(true)} 
+                />
+              ) : (
+                author.initials || "?"
+              )}
             </span>
             <span className="text-[14px] text-gray-600 dark:text-gray-300 font-medium line-clamp-1">
               {author.name || "Unknown"}

@@ -5,10 +5,17 @@ const API_BASE_URL = 'https://forum-istad-api.cheat.casa'; // Or fetch from .env
 
 const fixUrl = (url) => {
   if (!url) return url;
-  if (url.includes('localhost:8070'))
-    return url.replace('http://localhost:8070/api/v1/profile-images', `${API_BASE_URL}/api/v1/media`);
-  if (url.startsWith('/')) return `${API_BASE_URL}${url}`;
-  return url;
+  
+  let base = url;
+  if (url.includes('localhost:8070')) {
+    base = url.replace('http://localhost:8070/api/v1/profile-images', `${API_BASE_URL}/api/v1/media`);
+  } else if (url.startsWith('/')) {
+    base = `${API_BASE_URL}${url}`;
+  }
+  
+  // Append timestamp for cache busting on profile images
+  const timestamp = Date.now();
+  return base.includes('?') ? `${base}&t=${timestamp}` : `${base}?t=${timestamp}`;
 };
 
 const transformProfileImage = (response) => {

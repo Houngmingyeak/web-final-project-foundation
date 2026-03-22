@@ -36,6 +36,7 @@ function mapPost(post) {
     score: post.score ?? 0,
     tags: post.tagResponses?.map((t) => t.tagName) ?? [],
     author: {
+      id: post.ownerId,
       initials,
       name: post.ownerDisplayName ?? "Unknown",
       color: getColor(post.ownerId ?? 0),
@@ -54,6 +55,7 @@ export default function QuestionsPage() {
   
   const { toggleBookmark, isBookmarked } = useBookmarks();
   const [activeTab, setActiveTab] = useState("Newest");
+  const [selectedTag, setSelectedTag] = useState(null);
 
   // ── Regular posts list (Newest / Active / Unanswered tabs) ────────────────
   const { data: posts, isLoading: postsLoading, isError: postsError } = useGetPostsQuery();
@@ -98,6 +100,13 @@ export default function QuestionsPage() {
       );
     }
 
+    // Apply Tag Filter if present
+    if (selectedTag) {
+      list = list.filter(p =>
+        p.tagResponses?.some(t => t.tagName.toLowerCase() === selectedTag.toLowerCase())
+      );
+    }
+
     if (activeTab === "Newest") {
       return list.sort((a, b) => new Date(b.creationDate + "Z") - new Date(a.creationDate + "Z"));
     }
@@ -108,7 +117,25 @@ export default function QuestionsPage() {
       return list.filter((p) => (p.comments?.length ?? 0) === 0);
     }
     return list;
-  }, [posts, scorePosts, activeTab, searchFilter]);
+  }, [posts, scorePosts, activeTab, searchFilter, selectedTag]);
+
+  // Extract available tags from the fetched posts
+  const availableTags = useMemo(() => {
+    const tagCounts = {};
+    if (posts) {
+      posts.forEach(p => {
+        p.tagResponses?.forEach(t => {
+          const tagName = t.tagName.toLowerCase();
+          tagCounts[tagName] = (tagCounts[tagName] || 0) + 1;
+        });
+      });
+    }
+    // Sort tags by frequency
+    return Object.entries(tagCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => entry[0])
+      .slice(0, 15); // Limit to top 15 tags
+  }, [posts]);
 
   return (
     <div className="flex bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
@@ -129,7 +156,7 @@ export default function QuestionsPage() {
 
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           {/* Tab Bar */}
-          <div className="flex mb-5 bg-gray-200 dark:bg-gray-800 rounded-2xl p-1 overflow-x-auto w-full md:w-fit scrollbar-hide">
+          <div className="flex mb-4 bg-gray-200 dark:bg-gray-800 rounded-2xl p-1 overflow-x-auto w-full md:w-fit scrollbar-hide">
             {TABS.map((tab) => (
               <button
                 key={tab}
@@ -144,6 +171,37 @@ export default function QuestionsPage() {
               </button>
             ))}
           </div>
+
+          {/* Filter Tags Bar */}
+          {!isLoading && !isError && availableTags.length > 0 && (
+            <div className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-hide pb-2">
+              <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 whitespace-nowrap mr-2">
+                Popular Tags:
+              </span>
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                  className={`px-3 py-1 text-xs font-semibold rounded-full border transition-all duration-200 whitespace-nowrap ${
+                    selectedTag === tag
+                      ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                      : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+              {selectedTag && (
+                <button
+                  onClick={() => setSelectedTag(null)}
+                  className="px-2 py-1 text-xs font-semibold rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-colors whitespace-nowrap ml-1"
+                  title="Clear tag filter"
+                >
+                  ✕ Clear
+                </button>
+              )}
+            </div>
+          )}
 
           {/* States */}
           {isLoading && (

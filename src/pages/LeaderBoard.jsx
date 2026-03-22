@@ -6,6 +6,8 @@ import { FiUser } from "react-icons/fi";
 import { useGetPostsSortedByScoreQuery } from "../features/post/postsApi";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../features/auth/authSlice";
+import { useGetProfileQuery } from "../features/profile/profileApi";
+import { useAuthImage } from "../hooks/useAuthImage";
 
 // ── Derive user rankings from posts ─────────────────────────────────────
 function buildRankings(posts) {
@@ -49,7 +51,7 @@ const AVATAR_COLORS = [
   "from-sky-400 to-cyan-500",
 ];
 
-const Avatar = ({ initials, index = 0, size = "md", isMe = false }) => {
+const Avatar = ({ initials, index = 0, size = "md", isMe = false, avatarSrc = null }) => {
   const sizeClass =
     size === "lg"
       ? "w-14 h-14 text-base"
@@ -61,9 +63,13 @@ const Avatar = ({ initials, index = 0, size = "md", isMe = false }) => {
     : AVATAR_COLORS[index % AVATAR_COLORS.length];
   return (
     <div
-      className={`${sizeClass} rounded-full bg-linear-to-br ${color} flex items-center justify-center font-bold text-white shrink-0 ${isMe ? "ring-2 ring-blue-400 ring-offset-2 dark:ring-offset-gray-800" : ""}`}
+      className={`${sizeClass} rounded-full overflow-hidden bg-linear-to-br ${color} flex items-center justify-center font-bold text-white shrink-0 ${isMe ? "ring-2 ring-blue-400 ring-offset-2 dark:ring-offset-gray-800" : ""}`}
     >
-      {initials}
+      {isMe && avatarSrc ? (
+        <img src={avatarSrc} alt="Avatar" className="w-full h-full object-cover" />
+      ) : (
+        initials
+      )}
     </div>
   );
 };
@@ -85,13 +91,17 @@ const ScoreBar = ({ score, max, isMe = false }) => {
 };
 
 // ── My Score Banner ──────────────────────────────────────────────────────
-function MyScoreBanner({ user, maxScore }) {
+function MyScoreBanner({ user, maxScore, avatarSrc }) {
   return (
     <div className="mb-6 bg-linear-to-r from-blue-600 to-violet-600 rounded-2xl p-5  dark:shadow-blue-900/40 text-white">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold text-lg ring-2 ring-white/40">
-            {user.initials}
+          <div className="w-12 h-12 rounded-full overflow-hidden bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold text-lg ring-2 ring-white/40">
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              user.initials
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -193,6 +203,9 @@ export default function Leaderboard() {
   const { data: posts, isLoading, isError } = useGetPostsSortedByScoreQuery();
   const currentUser = useSelector(selectCurrentUser);
 
+  const { data: profile } = useGetProfileQuery(undefined, { skip: !currentUser });
+  const myAvatarSrc = useAuthImage(profile?.profileImage ?? null);
+
   const users = posts ? buildRankings(posts) : [];
   const top3 = users.length >= 3 ? [users[1], users[0], users[2]] : users;
   const rankOrder = [2, 1, 3];
@@ -261,7 +274,7 @@ export default function Leaderboard() {
           <>
             {/* ── "You" Banner ─────────────────────────────────── */}
             {meInBoard && (
-              <MyScoreBanner user={meInBoard} maxScore={maxScore} />
+              <MyScoreBanner user={meInBoard} maxScore={maxScore} avatarSrc={myAvatarSrc} />
             )}
 
             {/* ── Top 3 Podium ─────────────────────────────────── */}
@@ -301,6 +314,7 @@ export default function Leaderboard() {
                       index={user.rank - 1}
                       size="lg"
                       isMe={isMe}
+                      avatarSrc={isMe ? myAvatarSrc : null}
                     />
 
                     <p className="mt-3 font-semibold text-slate-900 dark:text-white text-[16px] text-center truncate max-w-full">
@@ -356,6 +370,7 @@ export default function Leaderboard() {
                         index={user.rank - 1}
                         size="sm"
                         isMe={isMe}
+                        avatarSrc={isMe ? myAvatarSrc : null}
                       />
 
                       {/* Name + bar */}

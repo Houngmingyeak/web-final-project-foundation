@@ -45,9 +45,15 @@ function EyeIcon({ visible }) {
 }
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail") || "";
+    const savedPassword = localStorage.getItem("rememberedPassword") || "";
+    return { email: savedEmail, password: savedPassword };
+  });
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] = useState(() => {
+    return !!localStorage.getItem("rememberedEmail");
+  });
   const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
@@ -74,6 +80,15 @@ export default function Login() {
         email: formData.email,
         password: formData.password,
       }).unwrap();
+
+      if (remember) {
+        localStorage.setItem("rememberedEmail", formData.email);
+        localStorage.setItem("rememberedPassword", formData.password);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedPassword");
+      }
+
       toast.success("Login successful!");
       navigate("/questions");
     } catch (err) {
