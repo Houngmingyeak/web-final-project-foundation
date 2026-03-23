@@ -391,20 +391,38 @@ export default function Account() {
     })),
   ].sort((a, b) => b.date - a.date);
 
-  // Mock stats
-  const badges = { gold: 3, silver: 8, bronze: 15 };
-  const stats = {
-    xpEarned: 4720,
-    questions: questions.length,
-    answers: comments.length,
-    challenges: 12,
-    reputation: profile?.reputation ?? 0,
-    views: profile?.views ?? 0,
-    upVotes: profile?.upVotes ?? 0,
-    downVotes: profile?.downVotes ?? 0,
+  // ── Dynamic Data Calculation ──
+  const upVotes = profile?.upVotes ?? 0;
+  const downVotes = profile?.downVotes ?? 0;
+  const reputation = profile?.reputation ?? 0;
+  
+  // Calculate a mock XP based on real stats
+  const calculatedXp = (reputation * 15) + (questions.length * 10) + (comments.length * 15) + (upVotes * 5) - (downVotes * 2);
+  const xpEarned = Math.max(0, calculatedXp);
+
+  // Derive badges from reputation and stats
+  const badges = { 
+    gold: Math.max(0, Math.floor(reputation / 100) + Math.floor(upVotes / 50)),
+    silver: Math.max(0, Math.floor(reputation / 50) + Math.floor(questions.length / 10)), 
+    bronze: Math.max(0, Math.floor(reputation / 10) + Math.floor(comments.length / 5) + 1)
   };
 
-  // ── New Categorized Achievements Data ──
+  const stats = {
+    xpEarned: xpEarned,
+    questions: questions.length,
+    answers: comments.length,
+    challenges: Number(profile?.challengesCompleted ?? 0),
+    reputation: reputation,
+    views: profile?.views ?? 0,
+    upVotes: upVotes,
+    downVotes: downVotes,
+  };
+
+  const answeredQuestions = comments.length;
+  const totalUpvotes = upVotes;
+  const highestViewCount = questions.reduce((max, q) => Math.max(max, q.viewCount || 0), 0);
+  
+  // ── Dynamic Categories Data ──
   const achievementCategories = [
     {
       title: "Getting Started",
@@ -420,7 +438,7 @@ export default function Account() {
           progress: 1,
           total: 1,
           completed: true,
-          date: "2023-10-10",
+          date: profile?.creationDate ? profile.creationDate : "Recently",
         },
         {
           id: 2,
@@ -429,10 +447,10 @@ export default function Account() {
           icon: FiUser,
           color: "text-purple-500",
           bg: "bg-purple-100 dark:bg-purple-900/30",
-          progress: 2,
+          progress: (profile?.bio ? 1 : 0) + (profile?.profileImage ? 1 : 0),
           total: 2,
-          completed: true,
-          date: "2023-10-12",
+          completed: !!(profile?.bio && profile?.profileImage),
+          date: profile?.bio && profile?.profileImage ? "Completed" : null,
         },
         {
           id: 3,
@@ -441,10 +459,10 @@ export default function Account() {
           icon: FiHelpCircle,
           color: "text-emerald-500",
           bg: "bg-emerald-100 dark:bg-emerald-900/30",
-          progress: 1,
+          progress: questions.length > 0 ? 1 : 0,
           total: 1,
-          completed: true,
-          date: "2023-10-15",
+          completed: questions.length > 0,
+          date: questions.length > 0 && questions[0]?.creationDate ? questions[questions.length - 1].creationDate : null,
         },
       ],
     },
@@ -459,21 +477,20 @@ export default function Account() {
           icon: FiMessageSquare,
           color: "text-emerald-500",
           bg: "bg-emerald-100 dark:bg-emerald-900/30",
-          progress: 32,
+          progress: Math.min(answeredQuestions, 50),
           total: 50,
-          completed: false,
+          completed: answeredQuestions >= 50,
         },
         {
           id: 5,
           title: "Crowd Favorite",
-          description: "Accumulate 1,000 total upvotes across posts.",
+          description: "Accumulate 100 total upvotes across posts.",
           icon: FiThumbsUp,
           color: "text-blue-500",
           bg: "bg-blue-100 dark:bg-blue-900/30",
-          progress: 1000,
-          total: 1000,
-          completed: true,
-          date: "2024-01-05",
+          progress: Math.min(totalUpvotes, 100),
+          total: 100,
+          completed: totalUpvotes >= 100,
         },
         {
           id: 6,
@@ -482,21 +499,20 @@ export default function Account() {
           icon: FiEye,
           color: "text-indigo-500",
           bg: "bg-indigo-100 dark:bg-indigo-900/30",
-          progress: 500,
+          progress: Math.min(highestViewCount, 500),
           total: 500,
-          completed: true,
-          date: "2024-02-15",
+          completed: highestViewCount >= 500,
         },
         {
           id: 7,
-          title: "Streak Master",
-          description: "Log in and contribute for 7 consecutive days.",
+          title: "Reputable Expert",
+          description: "Gain a reputation score of at least 50.",
           icon: FiZap,
           color: "text-orange-500",
           bg: "bg-orange-100 dark:bg-orange-900/30",
-          progress: 4,
-          total: 7,
-          completed: false,
+          progress: Math.min(reputation, 50),
+          total: 50,
+          completed: reputation >= 50,
         },
       ],
     },
@@ -511,33 +527,31 @@ export default function Account() {
           icon: FiAwardIcon,
           color: "text-yellow-500",
           bg: "bg-yellow-100 dark:bg-yellow-900/30",
-          progress: 3,
+          progress: Math.min(badges.gold, 5),
           total: 5,
-          completed: false,
+          completed: badges.gold >= 5,
         },
         {
           id: 9,
           title: "Code Guru",
-          description: "Provide 10 answers with accepted code blocks.",
+          description: "Reach 500 XP to prove your expertise.",
           icon: FiCode,
           color: "text-rose-500",
           bg: "bg-rose-100 dark:bg-rose-900/30",
-          progress: 10,
-          total: 10,
-          completed: true,
-          date: "2024-03-01",
+          progress: Math.min(xpEarned, 500),
+          total: 500,
+          completed: xpEarned >= 500,
         },
         {
           id: 10,
           title: "Problem Solver",
-          description:
-            "Have your answer accepted as the correct solution 20 times.",
+          description: "Provide 20 answers to the community.",
           icon: FiCheck,
           color: "text-teal-500",
           bg: "bg-teal-100 dark:bg-teal-900/30",
-          progress: 14,
+          progress: Math.min(answeredQuestions, 20),
           total: 20,
-          completed: false,
+          completed: answeredQuestions >= 20,
         },
       ],
     },
@@ -859,10 +873,12 @@ export default function Account() {
                                       <div className="text-[11px] font-bold text-emerald-500 flex items-center gap-1.5 uppercase tracking-wide">
                                         <FiCalendar className="w-3.5 h-3.5" />
                                         Unlocked{" "}
-                                        {format(
-                                          new Date(ach.date),
-                                          "MMM d, yyyy",
-                                        )}
+                                        {(() => {
+                                          if (!ach.date) return "Recently";
+                                          const dateStr = typeof ach.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(ach.date) && !ach.date.endsWith('Z') ? ach.date + 'Z' : ach.date;
+                                          const d = new Date(dateStr);
+                                          return isNaN(d.getTime()) ? String(ach.date) : format(d, "MMM d, yyyy");
+                                        })()}
                                       </div>
                                     ) : (
                                       <div className="space-y-1.5">

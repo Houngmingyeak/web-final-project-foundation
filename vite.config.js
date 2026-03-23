@@ -2,11 +2,34 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import flowbiteReact from "flowbite-react/plugin/vite"
+import sitemap from 'vite-plugin-sitemap'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), flowbiteReact()],
+  plugins: [
+    react(), 
+    tailwindcss(), 
+    flowbiteReact(),
+    sitemap({
+      hostname: 'https://mindstack.study',
+      dynamicRoutes: [
+        '/',
+        '/search',
+        '/leaderboard',
+        '/login',
+        '/signup',
+        '/profile'
+      ],
+      generateRobotsTxt: true,
+      robots: [{
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/profile']
+      }]
+    })
+  ],
   build: {
+    target: 'es2015',
     rollupOptions: {
       output: {
         manualChunks(id) {
