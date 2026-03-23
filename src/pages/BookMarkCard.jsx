@@ -46,10 +46,20 @@ function BookmarkAuthorAvatar({ ownerId, displayName }) {
     if (avatarSrc) setImgError(false);
   }, [avatarSrc]);
 
-  return avatarSrc && !imgError ? (
-    <img src={avatarSrc} alt={displayName} className="w-full h-full object-cover" onError={() => setImgError(true)} />
-  ) : (
-    <>{displayName?.slice(0, 2).toUpperCase() ?? "??"}</>
+  return (
+    <div
+      className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden ${
+        avatarSrc && !imgError
+          ? "bg-transparent"
+          : "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
+      }`}
+    >
+      {avatarSrc && !imgError ? (
+        <img src={avatarSrc} alt={displayName} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+      ) : (
+        <>{displayName?.slice(0, 2).toUpperCase() ?? "??"}</>
+      )}
+    </div>
   );
 }
 
@@ -151,12 +161,7 @@ function BookmarkItem({ post, onRemove, removing }) {
       >
         {/* Author */}
         <div className="flex items-center gap-2">
-          <div
-            className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900/40 flex items-center
-            justify-center text-blue-600 dark:text-blue-400 text-[10px] font-bold shrink-0 overflow-hidden"
-          >
-            <BookmarkAuthorAvatar ownerId={post.ownerId} displayName={post.ownerDisplayName} />
-          </div>
+          <BookmarkAuthorAvatar ownerId={post.ownerId} displayName={post.ownerDisplayName} />
           <span className="text-[13px] text-slate-600 dark:text-gray-300 font-medium">
             {post.ownerDisplayName ?? "Unknown"}
           </span>
@@ -270,8 +275,11 @@ export default function BookmarkCard() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex items-center gap-4">
             <div
-              className="w-14 h-14 rounded-xl bg-linear-to-br from-blue-500 to-violet-500
-              flex items-center justify-center font-bold text-white text-lg shrink-0 overflow-hidden"
+              className={`w-14 h-14 rounded-xl flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden ${
+                avatarSrc 
+                  ? "bg-transparent" 
+                  : "bg-linear-to-br from-blue-500 to-violet-500 text-white"
+              }`}
             >
               {avatarSrc ? (
                 <img

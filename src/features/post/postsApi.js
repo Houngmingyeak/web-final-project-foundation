@@ -91,6 +91,78 @@ export const postsApi = createApi({
         { type: 'Post', id: 'SCORE' }
       ]
     }),
+    getPostsByAnswers: builder.query({
+      query: (parentId) => `/posts/answers/${parentId}`,
+      providesTags: (result, error, parentId) => [{ type: 'Post', id: `ANSWERS_${parentId}` }],
+    }),
+    getPostsSortedByViews: builder.query({
+      query: () => '/posts/sort/views',
+      providesTags: [{ type: 'Post', id: 'VIEWS' }],
+    }),
+    getPostsByTag: builder.query({
+      query: (tagId) => `/posts/tag/${tagId}`,
+      providesTags: (result, error, tagId) => [{ type: 'Post', id: `TAG_${tagId}` }, { type: 'Post', id: 'LIST' }],
+    }),
+    getPostsByType: builder.query({
+      query: (postTypeId) => `/posts/type/${postTypeId}`,
+      providesTags: (result, error, postTypeId) => [{ type: 'Post', id: `TYPE_${postTypeId}` }],
+    }),
+    getPopularTags: builder.query({
+      query: () => '/tags/popular',
+      providesTags: [{ type: 'Tag', id: 'POPULAR' }],
+    }),
+    getTagsSearch: builder.query({
+      query: (params) => ({ url: '/tags/search', params }),
+      providesTags: [{ type: 'Tag', id: 'SEARCH' }],
+    }),
+    getTopTags: builder.query({
+      query: (limit) => `/tags/top/${limit}`,
+      providesTags: [{ type: 'Tag', id: 'TOP' }],
+    }),
+    getTagById: builder.query({
+      query: (tagId) => `/tags/${tagId}`,
+      providesTags: (result, error, tagId) => [{ type: 'Tag', id: tagId }],
+    }),
+    updateTag: builder.mutation({
+      query: ({ tagId, tagName }) => ({
+        url: `/tags/${tagId}`,
+        method: 'PUT',
+        body: { tagName },
+      }),
+      invalidatesTags: (result, error, { tagId }) => [{ type: 'Tag', id: tagId }, { type: 'Tag', id: 'LIST' }],
+    }),
+    deleteTag: builder.mutation({
+      query: (tagId) => ({
+        url: `/tags/${tagId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Tag', id: 'LIST' }],
+    }),
+    getCommentsByPost: builder.query({
+      query: (postId) => `/comments/post/${postId}`,
+      providesTags: (result, error, postId) => [{ type: 'Post', id: postId }],
+    }),
+    getCommentsByUser: builder.query({
+      query: (userId) => `/comments/user/${userId}`,
+    }),
+    getCommentsSearch: builder.query({
+      query: (params) => ({ url: '/comments/search', params }),
+    }),
+    updateComment: builder.mutation({
+      query: ({ commentId, ...patch }) => ({
+        url: `/comments/${commentId}`,
+        method: 'PUT',
+        body: patch,
+      }),
+      invalidatesTags: ['Post'],
+    }),
+    deleteComment: builder.mutation({
+      query: (commentId) => ({
+        url: `/comments/${commentId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Post'],
+    }),
   }),
 });
 
@@ -105,4 +177,19 @@ export const {
   useCreateCommentMutation,
   useUpdatePostMutation,
   useDeletePostMutation,
+  useGetPostsByAnswersQuery,
+  useGetPostsSortedByViewsQuery,
+  useGetPostsByTagQuery,
+  useGetPostsByTypeQuery,
+  useGetPopularTagsQuery,
+  useGetTagsSearchQuery,
+  useGetTopTagsQuery,
+  useGetTagByIdQuery,
+  useUpdateTagMutation,
+  useDeleteTagMutation,
+  useGetCommentsByPostQuery,
+  useGetCommentsByUserQuery,
+  useGetCommentsSearchQuery,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
 } = postsApi;

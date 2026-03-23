@@ -53,7 +53,7 @@ import {
 import AccountProfileDropdown from "../components/AccountProfileDropdown";
 
 import Sidebar from "../layout/Sidebar";
-import mindstack from "../assets/mindstack.png";
+import mindstack from "../assets/Mindstack.png";
 
 // ── Navigation Item ───────────────────────────────────────────────────────
 function NavItem({ icon: Icon, label, to, active, onClick }) {
@@ -202,9 +202,6 @@ export default function Account() {
     useUpdatePasswordMutation();
   const { data: bookmarks = [] } = useGetBookmarksQuery();
 
-  // Avatar refresh key for cache busting
-  const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
-
   // Process profile image
   let profilImageSplit = profile?.profileImage;
   if (profilImageSplit?.includes("localhost:8070")) {
@@ -212,11 +209,6 @@ export default function Account() {
       "http://localhost:8070/api/v1/profile-images",
       "https://forum-istad-api.cheat.casa/api/v1/media",
     );
-  }
-  
-  // Append cache busting key if image exists
-  if (profilImageSplit) {
-    profilImageSplit = `${profilImageSplit}?t=${avatarRefreshKey}`;
   }
   const avatarSrc = useAuthImage(profilImageSplit);
 
@@ -272,8 +264,7 @@ export default function Account() {
     if (!selectedFile) return;
     try {
       await uploadImage(selectedFile).unwrap();
-      setAvatarRefreshKey(prev => prev + 1); // Trigger image refetch
-      toast.success("Profile photo updated!");
+      toast.success("Profile photo updated! ✨");
       closeAvatarModal();
     } catch (err) {
       toast.error(err?.data?.message || "Upload failed");
@@ -287,7 +278,7 @@ export default function Account() {
         username: formData.displayName,
         bio: formData.bio,
       }).unwrap();
-      toast.success("Profile saved!");
+      toast.success("Profile saved! 🚀");
       setIsEditing(false);
     } catch (err) {
       toast.error(err?.data?.message || "Update failed");
@@ -321,7 +312,7 @@ export default function Account() {
         newPassword,
         confirmedNewPassword,
       }).unwrap();
-      toast.success("Password changed successfully!");
+      toast.success("Password changed successfully! 🔒");
       closePwModal();
     } catch (err) {
       toast.error(
@@ -391,38 +382,20 @@ export default function Account() {
     })),
   ].sort((a, b) => b.date - a.date);
 
-  // ── Dynamic Data Calculation ──
-  const upVotes = profile?.upVotes ?? 0;
-  const downVotes = profile?.downVotes ?? 0;
-  const reputation = profile?.reputation ?? 0;
-  
-  // Calculate a mock XP based on real stats
-  const calculatedXp = (reputation * 15) + (questions.length * 10) + (comments.length * 15) + (upVotes * 5) - (downVotes * 2);
-  const xpEarned = Math.max(0, calculatedXp);
-
-  // Derive badges from reputation and stats
-  const badges = { 
-    gold: Math.max(0, Math.floor(reputation / 100) + Math.floor(upVotes / 50)),
-    silver: Math.max(0, Math.floor(reputation / 50) + Math.floor(questions.length / 10)), 
-    bronze: Math.max(0, Math.floor(reputation / 10) + Math.floor(comments.length / 5) + 1)
-  };
-
+  // Mock stats
+  const badges = { gold: 3, silver: 8, bronze: 15 };
   const stats = {
-    xpEarned: xpEarned,
+    xpEarned: 4720,
     questions: questions.length,
     answers: comments.length,
-    challenges: Number(profile?.challengesCompleted ?? 0),
-    reputation: reputation,
+    challenges: 12,
+    reputation: profile?.reputation ?? 0,
     views: profile?.views ?? 0,
-    upVotes: upVotes,
-    downVotes: downVotes,
+    upVotes: profile?.upVotes ?? 0,
+    downVotes: profile?.downVotes ?? 0,
   };
 
-  const answeredQuestions = comments.length;
-  const totalUpvotes = upVotes;
-  const highestViewCount = questions.reduce((max, q) => Math.max(max, q.viewCount || 0), 0);
-  
-  // ── Dynamic Categories Data ──
+  // ── New Categorized Achievements Data ──
   const achievementCategories = [
     {
       title: "Getting Started",
@@ -438,7 +411,7 @@ export default function Account() {
           progress: 1,
           total: 1,
           completed: true,
-          date: profile?.creationDate ? profile.creationDate : "Recently",
+          date: "2023-10-10",
         },
         {
           id: 2,
@@ -447,10 +420,10 @@ export default function Account() {
           icon: FiUser,
           color: "text-purple-500",
           bg: "bg-purple-100 dark:bg-purple-900/30",
-          progress: (profile?.bio ? 1 : 0) + (profile?.profileImage ? 1 : 0),
+          progress: 2,
           total: 2,
-          completed: !!(profile?.bio && profile?.profileImage),
-          date: profile?.bio && profile?.profileImage ? "Completed" : null,
+          completed: true,
+          date: "2023-10-12",
         },
         {
           id: 3,
@@ -459,10 +432,10 @@ export default function Account() {
           icon: FiHelpCircle,
           color: "text-emerald-500",
           bg: "bg-emerald-100 dark:bg-emerald-900/30",
-          progress: questions.length > 0 ? 1 : 0,
+          progress: 1,
           total: 1,
-          completed: questions.length > 0,
-          date: questions.length > 0 && questions[0]?.creationDate ? questions[questions.length - 1].creationDate : null,
+          completed: true,
+          date: "2023-10-15",
         },
       ],
     },
@@ -477,20 +450,21 @@ export default function Account() {
           icon: FiMessageSquare,
           color: "text-emerald-500",
           bg: "bg-emerald-100 dark:bg-emerald-900/30",
-          progress: Math.min(answeredQuestions, 50),
+          progress: 32,
           total: 50,
-          completed: answeredQuestions >= 50,
+          completed: false,
         },
         {
           id: 5,
           title: "Crowd Favorite",
-          description: "Accumulate 100 total upvotes across posts.",
+          description: "Accumulate 1,000 total upvotes across posts.",
           icon: FiThumbsUp,
           color: "text-blue-500",
           bg: "bg-blue-100 dark:bg-blue-900/30",
-          progress: Math.min(totalUpvotes, 100),
-          total: 100,
-          completed: totalUpvotes >= 100,
+          progress: 1000,
+          total: 1000,
+          completed: true,
+          date: "2024-01-05",
         },
         {
           id: 6,
@@ -499,20 +473,21 @@ export default function Account() {
           icon: FiEye,
           color: "text-indigo-500",
           bg: "bg-indigo-100 dark:bg-indigo-900/30",
-          progress: Math.min(highestViewCount, 500),
+          progress: 500,
           total: 500,
-          completed: highestViewCount >= 500,
+          completed: true,
+          date: "2024-02-15",
         },
         {
           id: 7,
-          title: "Reputable Expert",
-          description: "Gain a reputation score of at least 50.",
+          title: "Streak Master",
+          description: "Log in and contribute for 7 consecutive days.",
           icon: FiZap,
           color: "text-orange-500",
           bg: "bg-orange-100 dark:bg-orange-900/30",
-          progress: Math.min(reputation, 50),
-          total: 50,
-          completed: reputation >= 50,
+          progress: 4,
+          total: 7,
+          completed: false,
         },
       ],
     },
@@ -527,31 +502,33 @@ export default function Account() {
           icon: FiAwardIcon,
           color: "text-yellow-500",
           bg: "bg-yellow-100 dark:bg-yellow-900/30",
-          progress: Math.min(badges.gold, 5),
+          progress: 3,
           total: 5,
-          completed: badges.gold >= 5,
+          completed: false,
         },
         {
           id: 9,
           title: "Code Guru",
-          description: "Reach 500 XP to prove your expertise.",
+          description: "Provide 10 answers with accepted code blocks.",
           icon: FiCode,
           color: "text-rose-500",
           bg: "bg-rose-100 dark:bg-rose-900/30",
-          progress: Math.min(xpEarned, 500),
-          total: 500,
-          completed: xpEarned >= 500,
+          progress: 10,
+          total: 10,
+          completed: true,
+          date: "2024-03-01",
         },
         {
           id: 10,
           title: "Problem Solver",
-          description: "Provide 20 answers to the community.",
+          description:
+            "Have your answer accepted as the correct solution 20 times.",
           icon: FiCheck,
           color: "text-teal-500",
           bg: "bg-teal-100 dark:bg-teal-900/30",
-          progress: Math.min(answeredQuestions, 20),
+          progress: 14,
           total: 20,
-          completed: answeredQuestions >= 20,
+          completed: false,
         },
       ],
     },
@@ -873,12 +850,10 @@ export default function Account() {
                                       <div className="text-[11px] font-bold text-emerald-500 flex items-center gap-1.5 uppercase tracking-wide">
                                         <FiCalendar className="w-3.5 h-3.5" />
                                         Unlocked{" "}
-                                        {(() => {
-                                          if (!ach.date) return "Recently";
-                                          const dateStr = typeof ach.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(ach.date) && !ach.date.endsWith('Z') ? ach.date + 'Z' : ach.date;
-                                          const d = new Date(dateStr);
-                                          return isNaN(d.getTime()) ? String(ach.date) : format(d, "MMM d, yyyy");
-                                        })()}
+                                        {format(
+                                          new Date(ach.date),
+                                          "MMM d, yyyy",
+                                        )}
                                       </div>
                                     ) : (
                                       <div className="space-y-1.5">
@@ -1206,11 +1181,11 @@ export default function Account() {
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="bg-white dark:bg-gray-900 w-full max-w-lg rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden"
             >
-              <div className="relative h-2 bg-linear-to-r from-amber-400 via-orange-500 to-rose-500" />
+              <div className="relative h-2 bg-blue-600" />
               <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100 dark:border-gray-800">
                 <div>
                   <h3 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                    <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-50 text-blue-600 dark:text-blue-600">
                       <FiShield className="w-5 h-5" />
                     </div>
                     Security Settings
@@ -1231,13 +1206,13 @@ export default function Account() {
                 onSubmit={handleChangePassword}
                 className="px-8 py-8 space-y-6"
               >
-                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 rounded-2xl flex items-start gap-3">
-                  <div className="p-1.5 bg-white dark:bg-amber-900/40 rounded-lg shadow-sm">
-                    <FiLock className="w-4 h-4 text-amber-500" />
+                <div className="p-4 bg-blue-100 dark:bg-gray-900/20 border border-blue-100 dark:border-blue-800/50 rounded-2xl flex items-start gap-3">
+                  <div className="p-1.5 bg-white dark:bg-blue-50 rounded-lg shadow-sm">
+                    <FiLock className="w-4 h-4 text-blue-600" />
                   </div>
-                  <p className="text-xs text-amber-900/70 dark:text-amber-200/70 leading-relaxed font-medium">
+                  <p className="text-xs text-blue-600 dark:text-blue-100 leading-relaxed font-medium">
                     Ensure your new password contains at least{" "}
-                    <strong className="text-amber-600 dark:text-amber-400 font-bold">
+                    <strong className="text-blue-600 dark:text-blue-400 font-bold">
                       8 characters
                     </strong>
                     , including letters and numbers for maximum security.
@@ -1250,7 +1225,7 @@ export default function Account() {
                     Verify Identity
                   </label>
                   <div className="relative group">
-                    <FiKey className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400 group-focus-within:text-amber-500 transition-colors" />
+                    <FiKey className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                     <input
                       type={showPw.old ? "text" : "password"}
                       required
@@ -1258,13 +1233,13 @@ export default function Account() {
                       onChange={(e) =>
                         setPwForm({ ...pwForm, oldPassword: e.target.value })
                       }
-                      className="w-full pl-12 pr-12 py-3.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white font-bold placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all"
+                      className="w-full pl-12 pr-12 py-3.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white font-bold placeholder-gray-400 focus:outline-none  focus:border-blue-600 transition-all"
                       placeholder="Enter current password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPw({ ...showPw, old: !showPw.old })}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-amber-500 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
                     >
                       {showPw.old ? (
                         <FiEyeOff className="w-4.5 h-4.5" />
@@ -1289,7 +1264,7 @@ export default function Account() {
                         onChange={(e) =>
                           setPwForm({ ...pwForm, newPassword: e.target.value })
                         }
-                        className="w-full px-4 py-3.5 pr-11 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white font-bold placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all font-mono"
+                        className="w-full px-4 py-3.5 pr-11 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white font-bold placeholder-gray-400 focus:outline-none  focus:border-blue-600 transition-all font-mono"
                         placeholder="8+ characters"
                       />
                       <button
@@ -1297,7 +1272,7 @@ export default function Account() {
                         onClick={() =>
                           setShowPw({ ...showPw, new: !showPw.new })
                         }
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-amber-500 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
                       >
                         {showPw.new ? (
                           <FiEyeOff className="w-4 h-4" />
@@ -1324,7 +1299,7 @@ export default function Account() {
                             confirmedNewPassword: e.target.value,
                           })
                         }
-                        className={`w-full px-4 py-3.5 pr-11 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white font-bold placeholder-gray-400 focus:outline-none focus:ring-4 transition-all font-mono
+                        className={`w-full px-4 py-3.5 pr-11 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white font-bold placeholder-gray-400 focus:outline-none transition-all font-mono
                           ${
                             pwForm.confirmedNewPassword &&
                             pwForm.newPassword !== pwForm.confirmedNewPassword
@@ -1332,8 +1307,8 @@ export default function Account() {
                               : pwForm.confirmedNewPassword &&
                                   pwForm.newPassword ===
                                     pwForm.confirmedNewPassword
-                                ? "border-emerald-400 focus:ring-emerald-400/10 focus:border-emerald-400"
-                                : "border-gray-200 dark:border-gray-700 focus:ring-amber-500/10 focus:border-amber-500"
+                                ? "border-emerald-400 focus:ring-blue-100 focus:border-blue-600"
+                                : "border-gray-200 dark:border-gray-700 focus:ring-blue-100 focus:border-blue-600"
                           }`}
                         placeholder="Repeat it"
                       />
@@ -1342,7 +1317,7 @@ export default function Account() {
                         onClick={() =>
                           setShowPw({ ...showPw, confirm: !showPw.confirm })
                         }
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-amber-500 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
                       >
                         {showPw.confirm ? (
                           <FiEyeOff className="w-4 h-4" />
@@ -1385,7 +1360,7 @@ export default function Account() {
                       (pwForm.confirmedNewPassword &&
                         pwForm.newPassword !== pwForm.confirmedNewPassword)
                     }
-                    className="flex-[1.5] flex items-center justify-center gap-2 py-3.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-black rounded-2xl transition-all shadow-lg shadow-amber-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-[1.5] flex items-center justify-center gap-2 py-3.5 bg-blue-600 hover:bg-blue-600 text-white text-sm font-black rounded-2xl transition-all shadow-lg shadow-amber-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isChangingPw ? (
                       <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />

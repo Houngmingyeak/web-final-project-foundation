@@ -46,6 +46,11 @@ export const profileApi = createApi({
       providesTags: (result, error, userId) => [{ type: 'Profile', id: userId }],
       transformResponse: transformProfileImage,
     }),
+    getUserByEmail: builder.query({
+      query: (email) => `/users/email/${email}`,
+      providesTags: (result, error, email) => [{ type: 'Profile', id: `EMAIL_${email}` }],
+      transformResponse: transformProfileImage,
+    }),
     uploadProfileImage: builder.mutation({
       query: (file) => {
         const formData = new FormData();
@@ -80,6 +85,7 @@ export const profileApi = createApi({
 export const {
   useGetProfileQuery,
   useGetUserByIdQuery,
+  useGetUserByEmailQuery,
   useUploadProfileImageMutation,
   useUpdateUserMutation,
   useUpdatePasswordMutation,

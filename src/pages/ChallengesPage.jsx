@@ -21,6 +21,12 @@ import {
   FiFileText,
   FiStar,
 } from "react-icons/fi";
+import { FaTag } from "react-icons/fa";
+import { MdChatBubble } from "react-icons/md";
+import { FaStar } from "react-icons/fa6";
+import { IoEyeSharp } from "react-icons/io5";
+import { LuNotebookPen } from "react-icons/lu";
+import { SiTicktick } from "react-icons/si";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -50,7 +56,7 @@ function getDifficultyMeta(score, views, comments) {
     };
   if (heat >= 5)
     return {
-      label: "Active ⚡",
+      label: <SiTicktick />,
       color:
         "text-blue-500 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800",
     };
@@ -131,7 +137,7 @@ function MilestoneCard({ icon, title, desc, current, target, xp, color }) {
         </span>
         <span className="flex items-center gap-1 text-[13px] font-bold text-slate-700 dark:text-gray-200">
           <FiZap className="text-amber-500" />
-          {xp} XP
+          {xp} Score
         </span>
       </div>
     </div>
@@ -147,7 +153,9 @@ function PostRow({ post, index }) {
     post.comments?.length ?? 0,
   );
   const timeAgo = post.creationDate
-    ? formatDistanceToNow(new Date(post.creationDate + "Z"), { addSuffix: true })
+    ? formatDistanceToNow(new Date(post.creationDate + "Z"), {
+        addSuffix: true,
+      })
     : "";
 
   return (
@@ -289,7 +297,7 @@ export default function ChallengesPage() {
   // ── Build milestones from real data ───────────────────────────────────
   const milestones = [
     {
-      icon: "📝",
+      icon: <LuNotebookPen />,
       title: "First Question",
       desc: "Post your first question",
       current: Math.min(posts.length, 1),
@@ -298,7 +306,7 @@ export default function ChallengesPage() {
       color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
     },
     {
-      icon: "🔥",
+      icon: <SiTicktick />,
       title: "Active Poster",
       desc: "Post 5 questions",
       current: Math.min(posts.length, 5),
@@ -308,7 +316,7 @@ export default function ChallengesPage() {
         "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400",
     },
     {
-      icon: "👁",
+      icon: <IoEyeSharp />,
       title: "Attention Getter",
       desc: "Get 20 total views",
       current: Math.min(stats.totalViews, 20),
@@ -317,7 +325,7 @@ export default function ChallengesPage() {
       color: "bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400",
     },
     {
-      icon: "💬",
+      icon: <MdChatBubble />,
       title: "Discussion Starter",
       desc: "Receive 5 comments",
       current: Math.min(stats.totalComments, 5),
@@ -327,7 +335,7 @@ export default function ChallengesPage() {
         "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
     },
     {
-      icon: "🏷",
+      icon: <FaTag />,
       title: "Tag Explorer",
       desc: "Use 3 different tags",
       current: Math.min(stats.uniqueTags.length, 3),
@@ -337,7 +345,7 @@ export default function ChallengesPage() {
         "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
     },
     {
-      icon: "⭐",
+      icon: <FaStar />,
       title: "Score Seeker",
       desc: "Earn a score on any post",
       current: posts.some((p) => (p.score ?? 0) > 0) ? 1 : 0,
@@ -383,7 +391,6 @@ export default function ChallengesPage() {
   if (!userId) {
     return (
       <div className="flex min-h-screen bg-slate-100 dark:bg-gray-900">
-        <SEO title="Dashboard" description="Login to track your challenges and activity stats rewards on MindStack." />
         <aside className="shrink-0">
           <Sidebar className="hidden lg:flex" />
         </aside>
@@ -409,7 +416,6 @@ export default function ChallengesPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-100 dark:bg-gray-900 transition-colors duration-300">
-      <SEO title="Dashboard" description="Track your scores, milestones, and daily activity rewards on MindStack." />
       <aside className="shrink-0">
         <Sidebar className="hidden lg:flex" />
       </aside>
@@ -474,31 +480,6 @@ export default function ChallengesPage() {
                 gradient="bg-linear-to-br from-emerald-400 to-teal-500 border-transparent shadow-emerald-500/20"
               />
             </div>
-            {/* ── Best Post Banner ──────────────────────────────── */}
-            {stats.bestPost && (
-              <div className="mb-6 bg-linear-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <span className="text-2xl shrink-0">🏆</span>
-                <div className="flex-1 min-w-0 w-full sm:w-auto">
-                  <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                    Your Best Post
-                  </p>
-                  <Link
-                    to={`/question/${stats.bestPost.id}`}
-                    className="text-[15px] font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate block"
-                  >
-                    {stats.bestPost.title}
-                  </Link>
-                </div>
-                <div className="flex items-center gap-4 shrink-0 text-sm font-semibold">
-                  <span className="text-amber-600 dark:text-amber-400">
-                    ⭐ {stats.bestPost.score ?? 0} score
-                  </span>
-                  <span className="text-slate-500 dark:text-gray-400">
-                    👁 {stats.bestPost.viewCount ?? 0} views
-                  </span>
-                </div>
-              </div>
-            )}
 
             {/* ── Milestones ────────────────────────────────────── */}
             <div className="mb-8">
@@ -515,70 +496,6 @@ export default function ChallengesPage() {
                   <MilestoneCard key={m.title} {...m} />
                 ))}
               </div>
-            </div>
-
-            {/* ── Posts / Activity ──────────────────────────────── */}
-            <div className="mb-7">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                <h2 className="text-[17px] font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <FiFileText className="text-indigo-500" /> Your Posts
-                </h2>
-
-                {/* Search & Filters */}
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <div className="relative shrink-0 flex-1 sm:flex-none sm:w-64">
-                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Search posts..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 dark:text-white"
-                    />
-                  </div>
-                  <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                    className="shrink-0 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 py-2 px-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-900 dark:text-white"
-                  >
-                    {SORT_OPTIONS.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Tag Filters */}
-              {allTags.length > 1 && (
-                <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-2 scrollbar-hide">
-                  {allTags.map(tag => (
-                    <button
-                      key={tag}
-                      onClick={() => setTagFilter(tag)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border ${tagFilter === tag
-                          ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800"
-                          : "bg-white dark:bg-gray-800 text-slate-600 dark:text-gray-300 border-slate-200 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700"
-                        }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Post List */}
-              {filtered.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filtered.map((p, i) => (
-                    <PostRow key={p.id} post={p} index={i} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-slate-300 dark:border-gray-700 flex flex-col items-center">
-                  <div className="text-4xl mb-3">📭</div>
-                  <p className="text-slate-500 dark:text-gray-400 font-medium text-[15px]">No posts match your filters</p>
-                </div>
-              )}
             </div>
           </>
         )}

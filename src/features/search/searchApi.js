@@ -14,6 +14,12 @@ export const searchApi = createApi({
         searchComments: builder.query({
             query: (query) => `/comments/search?query=${encodeURIComponent(query)}`,
         }),
+        searchPosts: builder.query({
+            query: (query) => `/posts/search?query=${encodeURIComponent(query)}`,
+        }),
+        searchPostsByRelevance: builder.query({
+            query: (query) => `/posts/search/relevance?query=${encodeURIComponent(query)}`,
+        }),
     }),
 });
 
@@ -21,7 +27,11 @@ export const {
     useSearchUsersQuery,
     useSearchTagsQuery,
     useSearchCommentsQuery,
+    useSearchPostsQuery,
+    useSearchPostsByRelevanceQuery,
     useLazySearchUsersQuery,
     useLazySearchTagsQuery,
     useLazySearchCommentsQuery,
+    useLazySearchPostsQuery,
+    useLazySearchPostsByRelevanceQuery,
 } = searchApi;

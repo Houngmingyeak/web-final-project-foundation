@@ -4,11 +4,11 @@ import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from '../features/auth/authSlice';
 import { useGetProfileQuery } from '../features/profile/profileApi';
 import { useAuthImage } from '../hooks/useAuthImage';
-import { FiSearch, FiMoon, FiSun, FiMenu, FiX, FiUser, FiHash, FiMessageSquare } from 'react-icons/fi';
+import { FiSearch, FiMoon, FiSun, FiMenu, FiX, FiUser, FiHash, FiMessageSquare, FiHelpCircle } from 'react-icons/fi';
 import { SlNote } from 'react-icons/sl';
 import MindStack from '../assets/mindstack.png';
 import { useTheme } from '../context/ThemeContext';
-import { useSearchUsersQuery, useSearchTagsQuery, useSearchCommentsQuery } from '../features/search/searchApi';
+import { useSearchUsersQuery, useSearchTagsQuery, useSearchPostsQuery } from '../features/search/searchApi';
 import { navItems } from '../layout/Sidebar';
 
 export default function Header() {
@@ -32,11 +32,13 @@ export default function Header() {
   // Mobile Menu state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAppSidebarOpen, setIsAppSidebarOpen] = useState(false);
+  const [isMobileSearchModalOpen, setIsMobileSearchModalOpen] = useState(false);
 
   // Close mobile menus when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsAppSidebarOpen(false);
+    setIsMobileSearchModalOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -56,11 +58,58 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const { data: usersData, isFetching: usersLoading } = useSearchUsersQuery(debouncedQuery, { skip: debouncedQuery.length < 2 });
   const { data: tagsData, isFetching: tagsLoading } = useSearchTagsQuery(debouncedQuery, { skip: debouncedQuery.length < 2 });
-  const { data: commentsData, isFetching: commentsLoading } = useSearchCommentsQuery(debouncedQuery, { skip: debouncedQuery.length < 2 });
+  const { data: postsData, isFetching: postsLoading } = useSearchPostsQuery(debouncedQuery, { skip: debouncedQuery.length < 2 });
 
-  const isSearching = usersLoading || tagsLoading || commentsLoading;
+  const isSearching = tagsLoading || postsLoading;
+
+  const renderSearchResults = (closeAction) => {
+    if (isSearching) {
+      return <div className="p-6 text-center text-gray-500 dark:text-gray-400 text-sm font-medium">Searching...</div>;
+    }
+    if (debouncedQuery.length >= 2 && tagsData?.length === 0 && postsData?.length === 0) {
+      return <div className="p-6 text-center text-gray-500 dark:text-gray-400 text-sm font-medium">No results found for "{debouncedQuery}".</div>;
+    }
+    return (
+      <div className="py-2">
+        {tagsData && tagsData.length > 0 && (
+          <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800/60">
+            <h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-3">
+              <FiHash /> Tags
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {tagsData.slice(0, 5).map(tag => (
+                <Link key={tag.id} to={`/questions?tag=${tag.tagName}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 group transition-colors border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-800" onClick={closeAction}>
+                  <FiHash className="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-500" />
+                  <span className="text-[13px] font-bold text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">{tag.tagName}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {postsData && postsData.length > 0 && (
+          <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800/60">
+            <h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-3">
+              <FiHelpCircle /> Questions
+            </h3>
+            <div className="space-y-1">
+              {postsData.slice(0, 5).map(post => (
+                <Link key={post.id} to={`/question/${post.id}`} className="group flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors" onClick={closeAction}>
+                  <div className="mt-0.5 p-1.5 bg-gray-100 dark:bg-gray-900 rounded-md group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors shrink-0">
+                    <FiHelpCircle className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                  </div>
+                  <span className="text-[14px] font-bold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white line-clamp-2 leading-snug">
+                    {post.title}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // const isHomePage = location.pathname === "/";
   const isHomePage =
@@ -272,65 +321,7 @@ export default function Header() {
             {isSearchOpen && debouncedQuery.length >= 2 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden z-50">
                 <div className="max-h-96 overflow-y-auto w-full">
-                  {isSearching ? (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-                      Searching...
-                    </div>
-                  ) : (usersData?.length === 0 && tagsData?.length === 0 && commentsData?.length === 0) ? (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-                      No results found for "{debouncedQuery}".
-                    </div>
-                  ) : (
-                    <div className="py-2">
-                      {/* Users */}
-                      {usersData && usersData.length > 0 && (
-                        <div className="px-4 py-2">
-                          <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase flex items-center gap-2 mb-2">
-                            <FiUser /> Users
-                          </h3>
-                          <div className="space-y-1">
-                            {usersData.slice(0, 5).map(user => (
-                              <Link key={user.id || user.userId} to={`/profile/${user.id || user.userId}`} className="block px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-600 transition-colors">
-                                <span className="text-sm font-medium dark:text-gray-200">{user.displayName || user.username}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Tags */}
-                      {tagsData && tagsData.length > 0 && (
-                        <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800">
-                          <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase flex items-center gap-2 mb-2">
-                            <FiHash /> Tags
-                          </h3>
-                          <div className="space-y-1">
-                            {tagsData.slice(0, 5).map(tag => (
-                              <Link key={tag.id} to={`/questions`} className="block px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-600 transition-colors" onClick={() => setIsSearchOpen(false)}>
-                                <span className="text-sm font-medium dark:text-gray-200">{tag.tagName}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Comments */}
-                      {commentsData && commentsData.length > 0 && (
-                        <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800">
-                          <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase flex items-center gap-2 mb-2">
-                            <FiMessageSquare /> Comments
-                          </h3>
-                          <div className="space-y-1">
-                            {commentsData.slice(0, 5).map(comment => (
-                              <Link key={comment.id} to={`/question/${comment.postId}`} className="block px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-600 transition-colors" onClick={() => setIsSearchOpen(false)}>
-                                <span className="text-sm font-medium dark:text-gray-200 line-clamp-1">{comment.content}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {renderSearchResults(() => setIsSearchOpen(false))}
                 </div>
               </div>
             )}
@@ -339,6 +330,14 @@ export default function Header() {
 
         {/* Ask Button + Dark Mode + Avatar */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <button
+            onClick={() => setIsMobileSearchModalOpen(true)}
+            className="sm:hidden p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            aria-label="Open Search"
+          >
+            <FiSearch className="w-5 h-5" />
+          </button>
+
           {isAuthenticated && (
             <Link
               to="/ask"
@@ -432,6 +431,48 @@ export default function Header() {
                 </Link>
               )}
             </nav>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Search Modal */}
+      {isMobileSearchModalOpen && (
+        <div className="sm:hidden fixed inset-0 z-100 flex flex-col bg-white dark:bg-gray-950 animate-in fade-in duration-200">
+          <div className="h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 gap-3 shrink-0">
+            <div className="flex-1 relative">
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <input
+                type="text"
+                autoFocus
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchOpen(true);
+                }}
+                placeholder="Search questions, topics..."
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-transparent rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-[15px]"
+              />
+            </div>
+            <button
+              onClick={() => {
+                setIsMobileSearchModalOpen(false);
+                setSearchQuery('');
+              }}
+              className="px-2 text-[15px] font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto w-full bg-white dark:bg-gray-950">
+            {debouncedQuery.length >= 2 ? (
+              renderSearchResults(() => setIsMobileSearchModalOpen(false))
+            ) : (
+              <div className="p-8 mt-10 text-center text-gray-400 dark:text-gray-500">
+                <FiSearch className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <p className="text-[15px]">Search for questions, topics, or tags</p>
+              </div>
+            )}
           </div>
         </div>
       )}

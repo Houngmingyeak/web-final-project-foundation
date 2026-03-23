@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaRegEye, FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 import { FiArrowUp } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useGetUserByIdQuery } from "../features/profile/profileApi";
 import { useAuthImage } from "../hooks/useAuthImage";
 
@@ -15,6 +15,8 @@ function EyeIcon() {
 }
 
 export default function QuestionCard({ question, isBookmarked, onToggleBookmark }) {
+  const navigate = useNavigate();
+
   if (!question) return null;
 
   const { author = {}, comments = 0, views = 0, score, time = "", id } = question;
@@ -31,12 +33,12 @@ export default function QuestionCard({ question, isBookmarked, onToggleBookmark 
   }, [avatarSrc]);
 
   return (
-    <Link to={`/question/${id}`}>
-      <div
-        className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-                   rounded-lg px-5 py-4 hover:border-gray-300 dark:hover:border-gray-600 
-                   hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer"
-      >
+    <div
+      onClick={() => navigate(`/question/${id}`)}
+      className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+                 rounded-lg px-5 py-4 hover:border-gray-300 dark:hover:border-gray-600 
+                 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+    >
 
 
         {/* Title */}
@@ -64,7 +66,10 @@ export default function QuestionCard({ question, isBookmarked, onToggleBookmark 
 
         {/* Footer */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-          <div className="flex items-center gap-2">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-2"
+          >
             <span className={`w-6 h-6 rounded-full ${author.color || "bg-gray-400"} 
                              flex items-center justify-center text-[13px] font-bold text-white shrink-0 overflow-hidden`}>
               {avatarSrc && !imgError ? (
@@ -100,6 +105,5 @@ export default function QuestionCard({ question, isBookmarked, onToggleBookmark 
           </div>
         </div>
       </div>
-    </Link>
   );
 }

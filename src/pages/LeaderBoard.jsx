@@ -206,20 +206,39 @@ export default function Leaderboard() {
   const { data: profile } = useGetProfileQuery(undefined, { skip: !currentUser });
   const myAvatarSrc = useAuthImage(profile?.profileImage ?? null);
 
-  const users = posts ? buildRankings(posts) : [];
+  let users = posts ? buildRankings(posts) : [];
+  const maxScore = users[0]?.totalScore ?? 1;
+
+  // ── Inject logged-in user with dynamic Profile data if missing from posts ──
+  const foundMe = users.find((u) => u.id === currentUser?.id);
+  if (currentUser && profile && !foundMe) {
+    users.push({
+      id: currentUser.id,
+      name: currentUser.displayName ?? "You",
+      initials: (currentUser.displayName ?? "??")
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase(),
+      totalScore: profile.reputation ?? 0,
+      totalViews: profile.views ?? 0,
+      posts: (posts || []).filter((p) => p.ownerId === currentUser.id).length,
+      comments: 0,
+    });
+    // Resort updated list
+    users = users
+      .sort((a, b) => b.totalScore - a.totalScore || b.totalViews - a.totalViews)
+      .map((u, i) => ({ ...u, rank: i + 1 }));
+  }
+
+  const meInBoard = currentUser
+    ? users.find((u) => u.id === currentUser.id)
+    : null;
+
   const top3 = users.length >= 3 ? [users[1], users[0], users[2]] : users;
   const rankOrder = [2, 1, 3];
   const rest = users.slice(3);
-  const maxScore = users[0]?.totalScore ?? 1;
-
-  // Find the logged-in user in the leaderboard
-  const meInBoard = currentUser
-    ? users.find(
-      (u) =>
-        u.id === currentUser.id ||
-        u.name?.toLowerCase() === currentUser.displayName?.toLowerCase(),
-    )
-    : null;
 
   return (
     <div className="flex min-h-screen bg-slate-100 dark:bg-gray-900 font-sans transition-colors duration-300">

@@ -20,6 +20,7 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword.jsx"));
 const AboutPage = lazy(() => import("./pages/AboutUsPage.jsx"));
 const Leaderboard = lazy(() => import("./pages/LeaderBoard.jsx"));
 const Account = lazy(() => import("./pages/Account.jsx"));
+const UserProfile = lazy(() => import("./pages/UserProfile.jsx"));
 
 
 function Layout() {
@@ -64,6 +65,7 @@ export default function App() {
             <Route path="/ask" element={<AskQuestion />} />
             <Route path="/about-us" element={<AboutPage />} />
             <Route path="/profile" element={<Account />} />
+            <Route path="/profile/:id" element={<UserProfile />} />
           </Route>
         </Routes>
       </Suspense>

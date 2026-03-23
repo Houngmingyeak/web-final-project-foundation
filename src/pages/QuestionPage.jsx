@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Sidebar from "../layout/Sidebar";
 import QuestionCard from "../components/QuestionCard";
 import { useGetPostsQuery, useGetPostsSortedByScoreQuery } from "../features/post/postsApi";
@@ -50,12 +50,19 @@ function mapPost(post) {
 }
 
 export default function QuestionsPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const searchFilter = searchParams.get("search")?.toLowerCase() || "";
+  const tagFilter = searchParams.get("tag");
   
   const { toggleBookmark, isBookmarked } = useBookmarks();
   const [activeTab, setActiveTab] = useState("Newest");
-  const [selectedTag, setSelectedTag] = useState(null);
+  const [selectedTag, setSelectedTag] = useState(tagFilter || null);
+
+  useEffect(() => {
+    if (tagFilter) {
+      setSelectedTag(tagFilter);
+    }
+  }, [tagFilter]);
 
   // ── Regular posts list (Newest / Active / Unanswered tabs) ────────────────
   const { data: posts, isLoading: postsLoading, isError: postsError } = useGetPostsQuery();
@@ -174,14 +181,20 @@ export default function QuestionsPage() {
 
           {/* Filter Tags Bar */}
           {!isLoading && !isError && availableTags.length > 0 && (
-            <div className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-hide pb-2">
+            <div 
+              className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-hide pb-2"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
               <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 whitespace-nowrap mr-2">
                 Popular Tags:
               </span>
               {availableTags.map((tag) => (
                 <button
                   key={tag}
-                  onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                  onClick={() => {
+                    setSelectedTag(selectedTag === tag ? null : tag);
+                    if (tagFilter) setSearchParams({});
+                  }}
                   className={`px-3 py-1 text-xs font-semibold rounded-full border transition-all duration-200 whitespace-nowrap ${
                     selectedTag === tag
                       ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
@@ -193,7 +206,10 @@ export default function QuestionsPage() {
               ))}
               {selectedTag && (
                 <button
-                  onClick={() => setSelectedTag(null)}
+                  onClick={() => {
+                    setSelectedTag(null);
+                    if (tagFilter) setSearchParams({});
+                  }}
                   className="px-2 py-1 text-xs font-semibold rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-colors whitespace-nowrap ml-1"
                   title="Clear tag filter"
                 >
