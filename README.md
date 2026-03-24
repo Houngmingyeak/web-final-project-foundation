@@ -1,4 +1,14 @@
-# React + Vite
+#MindStack
+
+## Overview
+The Project Forum is a comprehensive platform designed to foster collaboration, learning, and communication among users. It allows participants to post questions, share ideas, provide solutions, and engage in discussions on various project-related topics. Users can interact through comments, reply threads, and feedback mechanisms such as upvotes or likes to recognize valuable contributions. The forum is organized with categories, tags, and a search function, making it easy to find information and follow specific topics. By promoting knowledge sharing and collaboration, the Project Forum helps users solve problems efficiently, stay informed about project updates, and build a supportive community for continuous learning and development.
+
+---
+
+## Live Demo
+Visit the forum here: [MindStack](https://www.mindstack.study/)
+
+## React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
