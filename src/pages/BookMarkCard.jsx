@@ -103,7 +103,7 @@ function BookmarkItem({ post, onRemove, removing }) {
         className="absolute top-4 right-4 flex items-center gap-1 text-[12px] font-semibold
           text-slate-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400
           hover:bg-red-50 dark:hover:bg-red-900/20 px-2.5 py-1.5 rounded-lg
-          transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
+          transition-all "
         title="Remove bookmark"
       >
         <FiTrash2 className="w-3.5 h-3.5" /> Remove
